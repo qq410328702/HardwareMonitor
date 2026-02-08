@@ -1,0 +1,35 @@
+<Application x:Class="HardwareMonitor.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Startup="App_Startup">
+    <Application.Resources>
+        <!-- Default: Light theme -->
+        <Color x:Key="BgDark">#FFFAFBFC</Color>
+        <Color x:Key="BgCard">#FFEEF1F5</Color>
+        <Color x:Key="AccentBlue">#FF0969DA</Color>
+        <Color x:Key="AccentGreen">#FF1A7F37</Color>
+        <Color x:Key="AccentOrange">#FF9A6700</Color>
+        <Color x:Key="AccentRed">#FFCF222E</Color>
+        <Color x:Key="AccentPurple">#FF8250DF</Color>
+        <Color x:Key="TextPrimary">#FF1F2328</Color>
+        <Color x:Key="TextSecondary">#FF57606A</Color>
+
+        <SolidColorBrush x:Key="BgDarkBrush" Color="{StaticResource BgDark}"/>
+        <SolidColorBrush x:Key="BgCardBrush" Color="{StaticResource BgCard}"/>
+        <SolidColorBrush x:Key="AccentBlueBrush" Color="{StaticResource AccentBlue}"/>
+        <SolidColorBrush x:Key="AccentGreenBrush" Color="{StaticResource AccentGreen}"/>
+        <SolidColorBrush x:Key="AccentOrangeBrush" Color="{StaticResource AccentOrange}"/>
+        <SolidColorBrush x:Key="AccentRedBrush" Color="{StaticResource AccentRed}"/>
+        <SolidColorBrush x:Key="AccentPurpleBrush" Color="{StaticResource AccentPurple}"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#FFD0D7DE"/>
+
+        <!-- Mini window specific -->
+        <SolidColorBrush x:Key="MiniBgBrush" Color="#E8FAFBFC"/>
+        <SolidColorBrush x:Key="MiniBorderBrush" Color="#40000000"/>
+        <SolidColorBrush x:Key="MiniCardBrush" Color="#18000000"/>
+        <SolidColorBrush x:Key="MiniBarBgBrush" Color="#15000000"/>
+        <SolidColorBrush x:Key="MiniHintBrush" Color="#30000000"/>
+    </Application.Resources>
+</Application>
