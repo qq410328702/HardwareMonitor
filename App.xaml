@@ -4,15 +4,15 @@
              Startup="App_Startup">
     <Application.Resources>
         <!-- Default: Light theme -->
-        <Color x:Key="BgDark">#FFFAFBFC</Color>
-        <Color x:Key="BgCard">#FFEEF1F5</Color>
-        <Color x:Key="AccentBlue">#FF0969DA</Color>
-        <Color x:Key="AccentGreen">#FF1A7F37</Color>
+        <Color x:Key="BgDark">#FFF5F5F5</Color>
+        <Color x:Key="BgCard">#FFE8ECF1</Color>
+        <Color x:Key="AccentBlue">#FF2563EB</Color>
+        <Color x:Key="AccentGreen">#FF059669</Color>
         <Color x:Key="AccentOrange">#FF9A6700</Color>
-        <Color x:Key="AccentRed">#FFCF222E</Color>
-        <Color x:Key="AccentPurple">#FF8250DF</Color>
-        <Color x:Key="TextPrimary">#FF1F2328</Color>
-        <Color x:Key="TextSecondary">#FF57606A</Color>
+        <Color x:Key="AccentRed">#FFDC2626</Color>
+        <Color x:Key="AccentPurple">#FF7C3AED</Color>
+        <Color x:Key="TextPrimary">#FF1A1A2E</Color>
+        <Color x:Key="TextSecondary">#FF4A5568</Color>
 
         <SolidColorBrush x:Key="BgDarkBrush" Color="{StaticResource BgDark}"/>
         <SolidColorBrush x:Key="BgCardBrush" Color="{StaticResource BgCard}"/>
@@ -26,10 +26,10 @@
         <SolidColorBrush x:Key="BorderBrush" Color="#FFD0D7DE"/>
 
         <!-- Mini window specific -->
-        <SolidColorBrush x:Key="MiniBgBrush" Color="#E8FAFBFC"/>
-        <SolidColorBrush x:Key="MiniBorderBrush" Color="#40000000"/>
-        <SolidColorBrush x:Key="MiniCardBrush" Color="#18000000"/>
-        <SolidColorBrush x:Key="MiniBarBgBrush" Color="#15000000"/>
-        <SolidColorBrush x:Key="MiniHintBrush" Color="#30000000"/>
+        <SolidColorBrush x:Key="MiniBgBrush" Color="#F0F5F5F5"/>
+        <SolidColorBrush x:Key="MiniBorderBrush" Color="#30000000"/>
+        <SolidColorBrush x:Key="MiniCardBrush" Color="#20000000"/>
+        <SolidColorBrush x:Key="MiniBarBgBrush" Color="#18000000"/>
+        <SolidColorBrush x:Key="MiniHintBrush" Color="#40000000"/>
     </Application.Resources>
 </Application>

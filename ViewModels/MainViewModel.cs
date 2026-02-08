@@ -22,7 +22,8 @@ public class MainViewModel : BaseViewModel, IDisposable
     private float _cpuTemp, _cpuUsage, _cpuPower, _cpuClock;
     private string _gpuName = "GPU";
     private float _gpuTemp, _gpuUsage, _gpuPower, _gpuClock, _gpuMemUsed, _gpuMemTotal;
-    private float _memUsage, _memUsed, _memTotal;
+    private float _memUsage, _memUsed, _memTotal, _totalPower;
+    private bool _isLoading = true;
 
     private readonly ObservableCollection<ObservableValue> _cpuTempValues = new();
     private readonly ObservableCollection<ObservableValue> _gpuTempValues = new();
@@ -45,10 +46,11 @@ public class MainViewModel : BaseViewModel, IDisposable
     public float MemUsage { get => _memUsage; set => SetField(ref _memUsage, value); }
     public float MemUsed { get => _memUsed; set => SetField(ref _memUsed, value); }
     public float MemTotal { get => _memTotal; set => SetField(ref _memTotal, value); }
+    public float TotalPower { get => _totalPower; set => SetField(ref _totalPower, value); }
+    public bool IsLoading { get => _isLoading; set => SetField(ref _isLoading, value); }
 
     public ISeries[] TempSeries { get; }
     public ISeries[] UsageSeries { get; }
-
     public Axis[] HiddenAxes { get; } = [new Axis { ShowSeparatorLines = false, IsVisible = false }];
     public Axis[] TempYAxes { get; } = [new Axis
     {
@@ -77,21 +79,20 @@ public class MainViewModel : BaseViewModel, IDisposable
             MakeLine(_memUsageValues, "RAM", 0xBC, 0x8C, 0xFF)
         ];
 
-        // Background polling loop — hardware reads off UI thread
-        _ = PollAsync(_cts.Token);
+        // Init hardware async, then start polling
+        _ = StartAsync(_cts.Token);
     }
 
-    private static LineSeries<ObservableValue> MakeLine(
-        ObservableCollection<ObservableValue> values, string name, byte r, byte g, byte b)
-        => new()
-        {
-            Values = values,
-            Name = name,
-            Stroke = new SolidColorPaint(new SKColor(r, g, b)) { StrokeThickness = 2 },
-            GeometrySize = 0, GeometryStroke = null, GeometryFill = null,
-            Fill = new SolidColorPaint(new SKColor(r, g, b, 0x28)),
-            LineSmoothness = 0.65
-        };
+    private async Task StartAsync(CancellationToken ct)
+    {
+        // Heavy init on background thread — UI is already visible
+        await _hw.InitAsync();
+
+        Application.Current?.Dispatcher.Invoke(() => IsLoading = false);
+
+        // Start polling loop
+        await PollAsync(ct);
+    }
 
     private async Task PollAsync(CancellationToken ct)
     {
@@ -115,6 +116,7 @@ public class MainViewModel : BaseViewModel, IDisposable
         GpuPower = s.GpuPower; GpuClock = s.GpuClock;
         GpuMemUsed = s.GpuMemUsed; GpuMemTotal = s.GpuMemTotal;
         MemUsage = s.MemUsage; MemUsed = s.MemUsed; MemTotal = s.MemTotal;
+        TotalPower = s.CpuPower + s.GpuPower;
 
         Push(_cpuTempValues, s.CpuTemp);
         Push(_gpuTempValues, s.GpuTemp);
@@ -128,6 +130,17 @@ public class MainViewModel : BaseViewModel, IDisposable
         col.Add(new ObservableValue(val));
         if (col.Count > MaxPoints) col.RemoveAt(0);
     }
+
+    private static LineSeries<ObservableValue> MakeLine(
+        ObservableCollection<ObservableValue> values, string name, byte r, byte g, byte b)
+        => new()
+        {
+            Values = values, Name = name,
+            Stroke = new SolidColorPaint(new SKColor(r, g, b)) { StrokeThickness = 2 },
+            GeometrySize = 0, GeometryStroke = null, GeometryFill = null,
+            Fill = new SolidColorPaint(new SKColor(r, g, b, 0x28)),
+            LineSmoothness = 0.65
+        };
 
     public void Dispose()
     {

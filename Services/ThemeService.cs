@@ -19,10 +19,10 @@ public static class ThemeService
             "#E80D1117", "#30FFFFFF", "#15FFFFFF", "#15FFFFFF", "#30FFFFFF"),
 
         new("浅色",
-            "#FFFAFBFC", "#FFEEF1F5", "#FFD0D7DE",
-            "#FF1F2328", "#FF57606A",
-            "#FF0969DA", "#FF1A7F37", "#FF9A6700", "#FFCF222E", "#FF8250DF",
-            "#E8FAFBFC", "#40000000", "#18000000", "#15000000", "#30000000"),
+            "#FFF5F5F5", "#FFE8ECF1", "#FFD0D7DE",
+            "#FF1A1A2E", "#FF4A5568",
+            "#FF2563EB", "#FF059669", "#FF9A6700", "#FFDC2626", "#FF7C3AED",
+            "#F0F5F5F5", "#30000000", "#20000000", "#18000000", "#40000000"),
 
         new("赛博朋克",
             "#FF0A0A1A", "#FF12122A", "#FF2A2A4A",

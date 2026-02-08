@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:conv="clr-namespace:HardwareMonitor.Converters"
-        Title="Monitor" Width="300" Height="175"
+        Title="Monitor" Width="320" Height="210"
         WindowStyle="None" AllowsTransparency="True"
         Topmost="True" ShowInTaskbar="False"
         ResizeMode="NoResize" Background="Transparent">
@@ -18,7 +18,6 @@
         </Border.Effect>
 
         <Grid>
-            <!-- Drag overlay -->
             <Border Background="Transparent"
                     MouseLeftButtonDown="DragArea_MouseDown"
                     MouseRightButtonDown="DragArea_MouseRightDown"
@@ -31,41 +30,31 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="6"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Header -->
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <Ellipse Width="8" Height="8" Margin="0,0,8,0">
-                        <Ellipse.Fill>
-                            <RadialGradientBrush>
-                                <GradientStop Color="#FF4ADE80" Offset="0"/>
-                                <GradientStop Color="#FF22C55E" Offset="1"/>
-                            </RadialGradientBrush>
-                        </Ellipse.Fill>
-                    </Ellipse>
+                    <Ellipse Width="8" Height="8" Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,8,0"/>
                     <TextBlock Text="Hardware Monitor" FontSize="12" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}" Opacity="0.7"/>
                 </StackPanel>
 
-                <!-- Stats -->
+                <!-- CPU / GPU -->
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="6"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="6"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
 
                     <!-- CPU -->
-                    <Border Grid.Column="0" Grid.Row="0" CornerRadius="10" Padding="12,8"
+                    <Border Grid.Column="0" CornerRadius="10" Padding="12,8"
                             Background="{DynamicResource MiniCardBrush}">
                         <StackPanel>
-                            <TextBlock Text="CPU" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"
-                                       FontWeight="Bold" Margin="0,0,0,4"/>
+                            <TextBlock Text="CPU" FontSize="10" Foreground="{DynamicResource AccentBlueBrush}"
+                                       FontWeight="Bold" Margin="0,0,0,3"/>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="22" FontWeight="Bold"
                                            Foreground="{DynamicResource TextPrimaryBrush}"
@@ -75,11 +64,19 @@
                                 <TextBlock FontSize="22" FontWeight="Bold"
                                            Foreground="{DynamicResource AccentBlueBrush}"
                                            Text="{Binding CpuUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"
-                                           Margin="10,0,0,0"/>
+                                           Margin="8,0,0,0"/>
                                 <TextBlock Text="%" FontSize="11" Foreground="{DynamicResource AccentBlueBrush}"
                                            VerticalAlignment="Bottom" Margin="1,0,0,4"/>
                             </StackPanel>
-                            <Grid Height="3" Margin="0,5,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                <TextBlock Text="⚡" FontSize="10" Margin="0,0,3,0"/>
+                                <TextBlock FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource AccentOrangeBrush}"
+                                           Text="{Binding CpuPower, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"/>
+                                <TextBlock Text="W" FontSize="9" Foreground="{DynamicResource AccentOrangeBrush}"
+                                           VerticalAlignment="Bottom" Margin="2,0,0,2"/>
+                            </StackPanel>
+                            <Grid Height="3" Margin="0,4,0,0">
                                 <Border Background="{DynamicResource MiniBarBgBrush}" CornerRadius="2"/>
                                 <Border Background="{DynamicResource AccentBlueBrush}" CornerRadius="2"
                                         HorizontalAlignment="Left" x:Name="CpuBar"/>
@@ -88,11 +85,11 @@
                     </Border>
 
                     <!-- GPU -->
-                    <Border Grid.Column="2" Grid.Row="0" CornerRadius="10" Padding="12,8"
+                    <Border Grid.Column="2" CornerRadius="10" Padding="12,8"
                             Background="{DynamicResource MiniCardBrush}">
                         <StackPanel>
-                            <TextBlock Text="GPU" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"
-                                       FontWeight="Bold" Margin="0,0,0,4"/>
+                            <TextBlock Text="GPU" FontSize="10" Foreground="{DynamicResource AccentGreenBrush}"
+                                       FontWeight="Bold" Margin="0,0,0,3"/>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="22" FontWeight="Bold"
                                            Foreground="{DynamicResource TextPrimaryBrush}"
@@ -102,21 +99,36 @@
                                 <TextBlock FontSize="22" FontWeight="Bold"
                                            Foreground="{DynamicResource AccentGreenBrush}"
                                            Text="{Binding GpuUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"
-                                           Margin="10,0,0,0"/>
+                                           Margin="8,0,0,0"/>
                                 <TextBlock Text="%" FontSize="11" Foreground="{DynamicResource AccentGreenBrush}"
                                            VerticalAlignment="Bottom" Margin="1,0,0,4"/>
                             </StackPanel>
-                            <Grid Height="3" Margin="0,5,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                <TextBlock Text="⚡" FontSize="10" Margin="0,0,3,0"/>
+                                <TextBlock FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource AccentOrangeBrush}"
+                                           Text="{Binding GpuPower, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"/>
+                                <TextBlock Text="W" FontSize="9" Foreground="{DynamicResource AccentOrangeBrush}"
+                                           VerticalAlignment="Bottom" Margin="2,0,0,2"/>
+                            </StackPanel>
+                            <Grid Height="3" Margin="0,4,0,0">
                                 <Border Background="{DynamicResource MiniBarBgBrush}" CornerRadius="2"/>
                                 <Border Background="{DynamicResource AccentGreenBrush}" CornerRadius="2"
                                         HorizontalAlignment="Left" x:Name="GpuBar"/>
                             </Grid>
                         </StackPanel>
                     </Border>
+                </Grid>
 
-                    <!-- RAM -->
-                    <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2"
-                            CornerRadius="10" Padding="12,7"
+                <!-- RAM + Total Power -->
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="6"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" CornerRadius="10" Padding="12,7"
                             Background="{DynamicResource MiniCardBrush}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -124,15 +136,15 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="RAM" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"
-                                       FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <TextBlock Text="RAM" FontSize="10" Foreground="{DynamicResource AccentPurpleBrush}"
+                                       FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
                             <Grid Grid.Column="1" VerticalAlignment="Center" Height="3">
                                 <Border Background="{DynamicResource MiniBarBgBrush}" CornerRadius="2"/>
-                                <Border CornerRadius="2" HorizontalAlignment="Left" x:Name="MemBar"
-                                        Background="{DynamicResource AccentPurpleBrush}"/>
+                                <Border Background="{DynamicResource AccentPurpleBrush}" CornerRadius="2"
+                                        HorizontalAlignment="Left" x:Name="MemBar"/>
                             </Grid>
-                            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="12,0,0,0">
-                                <TextBlock FontSize="15" FontWeight="Bold"
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0">
+                                <TextBlock FontSize="14" FontWeight="Bold"
                                            Foreground="{DynamicResource AccentPurpleBrush}"
                                            Text="{Binding MemUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"
                                            VerticalAlignment="Center"/>
@@ -141,14 +153,28 @@
                             </StackPanel>
                         </Grid>
                     </Border>
+
+                    <Border Grid.Column="2" CornerRadius="10" Padding="12,7"
+                            Background="{DynamicResource MiniCardBrush}" MinWidth="70">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="总功耗" FontSize="9" Foreground="{DynamicResource AccentOrangeBrush}"
+                                       FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,1,0,0">
+                                <TextBlock Text="⚡" FontSize="11"/>
+                                <TextBlock FontSize="15" FontWeight="Bold"
+                                           Foreground="{DynamicResource AccentOrangeBrush}"
+                                           Text="{Binding TotalPower, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"/>
+                                <TextBlock Text="W" FontSize="10" Foreground="{DynamicResource AccentOrangeBrush}"
+                                           VerticalAlignment="Bottom" Margin="2,0,0,3"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
                 </Grid>
 
-                <!-- Hint -->
-                <TextBlock Grid.Row="4" Text="拖拽移动 · 右键关闭" FontSize="9"
+                <TextBlock Grid.Row="6" Text="拖拽移动 · 右键关闭" FontSize="9"
                            Foreground="{DynamicResource MiniHintBrush}" HorizontalAlignment="Center"/>
             </Grid>
 
-            <!-- Buttons -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
                         Margin="0,10,14,0" Panel.ZIndex="2">
                 <Button Content="□" Click="Expand_Click" Style="{x:Null}"
