@@ -2,6 +2,7 @@ bin/
 obj/
 publish/
 single/
+*.zip
 *.user
 *.suo
 .vs/
