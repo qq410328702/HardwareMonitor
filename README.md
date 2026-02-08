@@ -13,6 +13,8 @@
 - **非管理员兼容** — 普通用户可运行（使用率正常，温度需管理员权限）
 
 ## 截图
+<img width="320" height="210" alt="image" src="https://github.com/user-attachments/assets/69061aeb-5775-4684-97f3-d5faed188864" />
+<img width="980" height="720" alt="image" src="https://github.com/user-attachments/assets/7b6571b3-c04e-4f85-838e-83ecfe05eb4a" />
 
 > 启动后默认显示浅色主题悬浮窗，点击 □ 按钮展开主窗口。
 
