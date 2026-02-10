@@ -24,6 +24,10 @@ public class MainViewModel : BaseViewModel, IDisposable
     private float _gpuTemp, _gpuUsage, _gpuPower, _gpuClock, _gpuMemUsed, _gpuMemTotal;
     private float _memUsage, _memUsed, _memTotal, _totalPower;
     private bool _isLoading = true;
+    private bool _isError;
+    private string _errorMessage = "";
+    private int _pollingIntervalMs = 1000;
+    private int _themeIndex;
 
     private readonly ObservableCollection<ObservableValue> _cpuTempValues = new();
     private readonly ObservableCollection<ObservableValue> _gpuTempValues = new();
@@ -48,6 +52,15 @@ public class MainViewModel : BaseViewModel, IDisposable
     public float MemTotal { get => _memTotal; set => SetField(ref _memTotal, value); }
     public float TotalPower { get => _totalPower; set => SetField(ref _totalPower, value); }
     public bool IsLoading { get => _isLoading; set => SetField(ref _isLoading, value); }
+    public bool IsError { get => _isError; set => SetField(ref _isError, value); }
+    public string ErrorMessage { get => _errorMessage; set => SetField(ref _errorMessage, value); }
+    public int PollingIntervalMs { get => _pollingIntervalMs; set => SetField(ref _pollingIntervalMs, value); }
+    public int ThemeIndex
+    {
+        get => _themeIndex;
+        set { if (SetField(ref _themeIndex, value)) ThemeService.Apply(value); }
+    }
+    public string[] ThemeNames => ThemeService.ThemeNames;
 
     public ISeries[] TempSeries { get; }
     public ISeries[] UsageSeries { get; }
@@ -63,9 +76,10 @@ public class MainViewModel : BaseViewModel, IDisposable
         LabelsPaint = new SolidColorPaint(new SKColor(0x8B, 0x94, 0x9E))
     }];
 
-    public MainViewModel()
+    public MainViewModel(HardwareService hw)
     {
-        _hw = new HardwareService();
+        _hw = hw;
+        _themeIndex = (int)ThemeService.Current;
 
         TempSeries =
         [
@@ -85,27 +99,64 @@ public class MainViewModel : BaseViewModel, IDisposable
 
     private async Task StartAsync(CancellationToken ct)
     {
-        // Heavy init on background thread — UI is already visible
-        await _hw.InitAsync();
+        try
+        {
+            // Heavy init on background thread — UI is already visible
+            await _hw.InitAsync();
 
-        Application.Current?.Dispatcher.Invoke(() => IsLoading = false);
+            // Check if InitAsync encountered an error internally
+            if (_hw.InitError is not null)
+            {
+                RunOnUI(() =>
+                {
+                    IsLoading = false;
+                    IsError = true;
+                    ErrorMessage = $"硬件初始化失败: {_hw.InitError}";
+                });
+                return;
+            }
 
-        // Start polling loop
-        await PollAsync(ct);
+            RunOnUI(() => IsLoading = false);
+
+            // Start polling loop
+            await PollAsync(ct);
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancellation is expected during shutdown — do not treat as error
+        }
+        catch (Exception ex)
+        {
+            RunOnUI(() =>
+            {
+                IsLoading = false;
+                IsError = true;
+                ErrorMessage = $"监控异常: {ex.Message}";
+            });
+        }
     }
 
     private async Task PollAsync(CancellationToken ct)
     {
-        try
+        while (!ct.IsCancellationRequested)
         {
-            while (!ct.IsCancellationRequested)
+            try
             {
                 var s = await Task.Run(() => _hw.GetSnapshot(), ct);
-                Application.Current?.Dispatcher.Invoke(() => ApplySnapshot(s));
-                await Task.Delay(1000, ct);
+                RunOnUI(() => ApplySnapshot(s));
             }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception)
+            {
+                // 单次轮询失败不终止循环，继续下一次
+            }
+
+            try
+            {
+                await Task.Delay(PollingIntervalMs, ct);
+            }
+            catch (OperationCanceledException) { break; }
         }
-        catch (OperationCanceledException) { }
     }
 
     private void ApplySnapshot(HardwareSnapshot s)
@@ -142,9 +193,23 @@ public class MainViewModel : BaseViewModel, IDisposable
             LineSmoothness = 0.65
         };
 
+    /// <summary>
+    /// Dispatches an action to the UI thread if a WPF Dispatcher is available,
+    /// otherwise executes it directly (e.g., in unit test environments).
+    /// </summary>
+    private static void RunOnUI(Action action)
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher != null)
+            dispatcher.BeginInvoke(action);
+        else
+            action();
+    }
+
     public void Dispose()
     {
         _cts.Cancel();
+        _cts.Dispose();
         _hw.Dispose();
     }
 }

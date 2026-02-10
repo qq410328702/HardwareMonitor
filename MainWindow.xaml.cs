@@ -1,9 +1,7 @@
-using HardwareMonitor.Services;
 using HardwareMonitor.ViewModels;
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 
@@ -23,14 +21,14 @@ namespace HardwareMonitor
             InitializeComponent();
             DataContext = vm;
 
-            ThemeCombo.ItemsSource = ThemeService.ThemeNames;
-            ThemeCombo.SelectedIndex = (int)ThemeService.Current;
+            Closing += MainWindow_Closing;
         }
 
-        private void ThemeCombo_Changed(object sender, SelectionChangedEventArgs e)
+        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (ThemeCombo.SelectedIndex >= 0)
-                ThemeService.Apply(ThemeCombo.SelectedIndex);
+            // Ensure the application shuts down (and OnExit fires) when MainWindow
+            // is closed via Alt+F4 or any other OS-level close path.
+            Application.Current.Shutdown();
         }
 
         private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
@@ -46,7 +44,6 @@ namespace HardwareMonitor
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            Vm.Dispose();
             Application.Current.Shutdown();
         }
 

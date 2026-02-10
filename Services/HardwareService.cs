@@ -1,32 +1,38 @@
 using LibreHardwareMonitor.Hardware;
 using System;
 using System.Diagnostics;
-using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace HardwareMonitor.Services;
 
-public sealed class HardwareService : IDisposable
+public class HardwareService : IDisposable
 {
     private Computer? _computer;
-    private readonly bool _isAdmin;
+    private readonly object _syncLock = new();
+    private readonly ILogger _logger;
     private volatile bool _ready;
+    private string? _initError;
+
+    // 缓存的硬件引用
+    private IHardware? _cpu;
+    private IHardware? _gpu;
+    private IHardware? _memory;
 
     private PerformanceCounter? _cpuCounter;
     private PerformanceCounter? _ramCounter;
 
-    public bool IsAdmin => _isAdmin;
     public bool IsReady => _ready;
+    public virtual string? InitError => _initError;
 
-    public HardwareService()
+    public HardwareService(ILogger logger)
     {
-        _isAdmin = IsRunningAsAdmin();
+        _logger = logger;
     }
 
     /// <summary>
     /// Heavy init on background thread — call once at startup.
     /// </summary>
-    public async Task InitAsync()
+    public virtual async Task InitAsync()
     {
         await Task.Run(() =>
         {
@@ -39,58 +45,85 @@ public sealed class HardwareService : IDisposable
                     IsMemoryEnabled = true
                 };
                 c.Open();
-                _computer = c;
+
+                lock (_syncLock)
+                {
+                    _computer = c;
+                    // 缓存硬件引用
+                    foreach (var hw in c.Hardware)
+                    {
+                        switch (hw.HardwareType)
+                        {
+                            case HardwareType.Cpu: _cpu = hw; break;
+                            case HardwareType.GpuNvidia:
+                            case HardwareType.GpuAmd:
+                            case HardwareType.GpuIntel: _gpu = hw; break;
+                            case HardwareType.Memory: _memory = hw; break;
+                        }
+                    }
+                }
+                _logger.Info("硬件监控初始化成功");
             }
-            catch { _computer = null; }
+            catch (Exception ex)
+            {
+                _initError = ex.Message;
+                _logger.Error("Computer 初始化失败", ex);
+            }
 
             try
             {
                 _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                 _cpuCounter.NextValue();
             }
-            catch { _cpuCounter = null; }
+            catch (Exception ex)
+            {
+                _cpuCounter = null;
+                _logger.Warn($"CPU PerformanceCounter 初始化失败: {ex.Message}");
+            }
 
             try
             {
                 _ramCounter = new PerformanceCounter("Memory", "Available MBytes");
                 _ramCounter.NextValue();
             }
-            catch { _ramCounter = null; }
+            catch (Exception ex)
+            {
+                _ramCounter = null;
+                _logger.Warn($"RAM PerformanceCounter 初始化失败: {ex.Message}");
+            }
 
             _ready = true;
         });
     }
 
-    public HardwareSnapshot GetSnapshot()
+    public virtual HardwareSnapshot GetSnapshot()
     {
         var snap = new HardwareSnapshot();
         if (!_ready) return snap;
 
-        if (_computer != null)
+        lock (_syncLock)
         {
-            try
+            if (_cpu is not null)
             {
-                foreach (var hw in _computer.Hardware)
-                {
-                    hw.Update();
-                    foreach (var sub in hw.SubHardware)
-                        sub.Update();
-
-                    switch (hw.HardwareType)
-                    {
-                        case HardwareType.Cpu: ReadCpu(hw, snap); break;
-                        case HardwareType.GpuNvidia:
-                        case HardwareType.GpuAmd:
-                        case HardwareType.GpuIntel: ReadGpu(hw, snap); break;
-                        case HardwareType.Memory: ReadMemory(hw, snap); break;
-                    }
-                }
+                try { _cpu.Update(); ReadCpu(_cpu, snap); }
+                catch (Exception ex) { _logger.Warn($"CPU 读取失败: {ex.Message}"); }
             }
-            catch { }
+            if (_gpu is not null)
+            {
+                try { _gpu.Update(); ReadGpu(_gpu, snap); }
+                catch (Exception ex) { _logger.Warn($"GPU 读取失败: {ex.Message}"); }
+            }
+            if (_memory is not null)
+            {
+                try { _memory.Update(); ReadMemory(_memory, snap); }
+                catch (Exception ex) { _logger.Warn($"内存读取失败: {ex.Message}"); }
+            }
         }
 
+        // PerformanceCounter fallback (outside lock since they're independent)
         if (snap.CpuUsage == 0 && _cpuCounter != null)
-            try { snap.CpuUsage = _cpuCounter.NextValue(); } catch { }
+            try { snap.CpuUsage = _cpuCounter.NextValue(); }
+            catch (Exception ex) { _logger.Warn($"CPU PerformanceCounter 读取失败: {ex.Message}"); }
 
         if (snap.MemUsage == 0 && _ramCounter != null)
         {
@@ -106,11 +139,12 @@ public sealed class HardwareService : IDisposable
                     snap.MemUsage = (totalMb - availMb) / totalMb * 100f;
                 }
             }
-            catch { }
+            catch (Exception ex) { _logger.Warn($"RAM PerformanceCounter 读取失败: {ex.Message}"); }
         }
 
         return snap;
     }
+
 
     private static void ReadCpu(IHardware hw, HardwareSnapshot snap)
     {
@@ -219,21 +253,20 @@ public sealed class HardwareService : IDisposable
         }
     }
 
-    private static bool IsRunningAsAdmin()
+    public virtual void Dispose()
     {
-        try
+        lock (_syncLock)
         {
-            using var identity = WindowsIdentity.GetCurrent();
-            return new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
+            _computer?.Close();
+            _computer = null;
+            _cpu = null;
+            _gpu = null;
+            _memory = null;
         }
-        catch { return false; }
-    }
-
-    public void Dispose()
-    {
-        _computer?.Close();
         _cpuCounter?.Dispose();
+        _cpuCounter = null;
         _ramCounter?.Dispose();
+        _ramCounter = null;
     }
 }
 

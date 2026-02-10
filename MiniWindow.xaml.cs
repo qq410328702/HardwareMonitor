@@ -5,15 +5,11 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Threading;
 
 namespace HardwareMonitor
 {
     public partial class MiniWindow : Window
     {
-        private readonly MainViewModel _vm;
-        private readonly DispatcherTimer _barTimer;
-
         public event EventHandler? ExpandRequested;
 
         // Win32 drag support
@@ -25,30 +21,11 @@ namespace HardwareMonitor
         public MiniWindow(MainViewModel vm)
         {
             InitializeComponent();
-            _vm = vm;
             DataContext = vm;
 
             var area = SystemParameters.WorkArea;
             Left = area.Right - Width - 16;
             Top = area.Bottom - Height - 16;
-
-            _barTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
-            _barTimer.Tick += (_, _) => UpdateBars();
-            _barTimer.Start();
-            Loaded += (_, _) => UpdateBars();
-        }
-
-        private void UpdateBars()
-        {
-            SetBarWidth(CpuBar, _vm.CpuUsage / 100f);
-            SetBarWidth(GpuBar, _vm.GpuUsage / 100f);
-            SetBarWidth(MemBar, _vm.MemUsage / 100f);
-        }
-
-        private static void SetBarWidth(FrameworkElement bar, float ratio)
-        {
-            if (bar.Parent is FrameworkElement parent && parent.ActualWidth > 0)
-                bar.Width = parent.ActualWidth * Math.Clamp(ratio, 0, 1);
         }
 
         private void DragArea_MouseDown(object sender, MouseButtonEventArgs e)
@@ -63,26 +40,22 @@ namespace HardwareMonitor
 
         private void DragArea_MouseRightDown(object sender, MouseButtonEventArgs e)
         {
-            _barTimer.Stop();
             Close();
         }
 
         private void Expand_Click(object sender, RoutedEventArgs e)
         {
             ExpandRequested?.Invoke(this, EventArgs.Empty);
-            _barTimer.Stop();
             Close();
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            _barTimer.Stop();
             Close();
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            _barTimer.Stop();
             base.OnClosing(e);
         }
     }

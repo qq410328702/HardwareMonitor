@@ -11,6 +11,7 @@
         ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <conv:TempToColorConverter x:Key="TempColor"/>
         <conv:TempToWpfColorConverter x:Key="TempWpfColor"/>
         <conv:UsageToColorConverter x:Key="UsageColor"/>
@@ -38,7 +39,9 @@
                                FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,8,0">
-                    <ComboBox x:Name="ThemeCombo" SelectionChanged="ThemeCombo_Changed"
+                    <ComboBox x:Name="ThemeCombo"
+                              ItemsSource="{Binding ThemeNames}"
+                              SelectedIndex="{Binding ThemeIndex}"
                               Width="80" Height="24" FontSize="11" VerticalAlignment="Center"
                               Margin="0,0,4,0" ToolTip="切换主题"/>
                     <Button Content="🔽" Click="MiniMode_Click" Style="{x:Null}"
@@ -56,9 +59,67 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Main Content -->
+            <!-- Error Panel: Visible when IsError == true -->
+            <Border Grid.Row="1" x:Name="ErrorPanel"
+                    Visibility="{Binding IsError, Converter={StaticResource BoolToVis}}"
+                    Background="{DynamicResource BgDarkBrush}" Panel.ZIndex="2">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="40">
+                    <TextBlock Text="⚠" FontSize="48" HorizontalAlignment="Center"
+                               Foreground="#F85149" Margin="0,0,0,16"/>
+                    <TextBlock Text="硬件监控初始化失败" FontSize="18" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                    <TextBlock Text="{Binding ErrorMessage}" FontSize="13"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center" TextWrapping="Wrap"
+                               MaxWidth="500" TextAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Loading Panel: Visible when IsLoading == true AND IsError == false -->
+            <Border Grid.Row="1" x:Name="LoadingPanel"
+                    Background="{DynamicResource BgDarkBrush}" Panel.ZIndex="1">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsLoading}" Value="True"/>
+                                    <Condition Binding="{Binding IsError}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Width="200" Height="4"
+                                 Foreground="{DynamicResource AccentGreenBrush}"
+                                 Background="#20888888" BorderThickness="0" Margin="0,0,0,16"/>
+                    <TextBlock Text="正在初始化硬件监控..." FontSize="14"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Normal Dashboard: Visible when IsLoading == false AND IsError == false -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled" Padding="20,8,20,20">
+                <ScrollViewer.Style>
+                    <Style TargetType="ScrollViewer">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsLoading}" Value="False"/>
+                                    <Condition Binding="{Binding IsError}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ScrollViewer.Style>
                 <StackPanel>
 
                     <!-- Top Row: Gauges -->

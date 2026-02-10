@@ -8,11 +8,23 @@
         ResizeMode="NoResize" Background="Transparent">
 
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <conv:FloatFormatConverter x:Key="FloatFmt"/>
+        <conv:RatioToWidthConverter x:Key="RatioToWidth"/>
     </Window.Resources>
 
-    <Border CornerRadius="16" BorderBrush="{DynamicResource MiniBorderBrush}" BorderThickness="1"
+    <Border CornerRadius="16" BorderThickness="2"
             Background="{DynamicResource MiniBgBrush}">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="BorderBrush" Value="{DynamicResource MiniBorderBrush}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsError}" Value="True">
+                        <Setter Property="BorderBrush" Value="#F85149"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
         <Border.Effect>
             <DropShadowEffect BlurRadius="24" ShadowDepth="2" Opacity="0.4" Color="Black"/>
         </Border.Effect>
@@ -36,7 +48,18 @@
 
                 <!-- Header -->
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <Ellipse Width="8" Height="8" Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,8,0"/>
+                    <Ellipse Width="8" Height="8" Margin="0,0,8,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{DynamicResource AccentGreenBrush}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsError}" Value="True">
+                                        <Setter Property="Fill" Value="#F85149"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
                     <TextBlock Text="Hardware Monitor" FontSize="12" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}" Opacity="0.7"/>
                 </StackPanel>
@@ -76,10 +99,17 @@
                                 <TextBlock Text="W" FontSize="9" Foreground="{DynamicResource AccentOrangeBrush}"
                                            VerticalAlignment="Bottom" Margin="2,0,0,2"/>
                             </StackPanel>
-                            <Grid Height="3" Margin="0,4,0,0">
+                            <Grid Height="3" Margin="0,4,0,0" x:Name="CpuBarContainer">
                                 <Border Background="{DynamicResource MiniBarBgBrush}" CornerRadius="2"/>
                                 <Border Background="{DynamicResource AccentBlueBrush}" CornerRadius="2"
-                                        HorizontalAlignment="Left" x:Name="CpuBar"/>
+                                        HorizontalAlignment="Left">
+                                    <Border.Width>
+                                        <MultiBinding Converter="{StaticResource RatioToWidth}">
+                                            <Binding Path="CpuUsage"/>
+                                            <Binding Path="ActualWidth" ElementName="CpuBarContainer"/>
+                                        </MultiBinding>
+                                    </Border.Width>
+                                </Border>
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -111,10 +141,17 @@
                                 <TextBlock Text="W" FontSize="9" Foreground="{DynamicResource AccentOrangeBrush}"
                                            VerticalAlignment="Bottom" Margin="2,0,0,2"/>
                             </StackPanel>
-                            <Grid Height="3" Margin="0,4,0,0">
+                            <Grid Height="3" Margin="0,4,0,0" x:Name="GpuBarContainer">
                                 <Border Background="{DynamicResource MiniBarBgBrush}" CornerRadius="2"/>
                                 <Border Background="{DynamicResource AccentGreenBrush}" CornerRadius="2"
-                                        HorizontalAlignment="Left" x:Name="GpuBar"/>
+                                        HorizontalAlignment="Left">
+                                    <Border.Width>
+                                        <MultiBinding Converter="{StaticResource RatioToWidth}">
+                                            <Binding Path="GpuUsage"/>
+                                            <Binding Path="ActualWidth" ElementName="GpuBarContainer"/>
+                                        </MultiBinding>
+                                    </Border.Width>
+                                </Border>
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -138,10 +175,17 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="RAM" FontSize="10" Foreground="{DynamicResource AccentPurpleBrush}"
                                        FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <Grid Grid.Column="1" VerticalAlignment="Center" Height="3">
+                            <Grid Grid.Column="1" VerticalAlignment="Center" Height="3" x:Name="MemBarContainer">
                                 <Border Background="{DynamicResource MiniBarBgBrush}" CornerRadius="2"/>
                                 <Border Background="{DynamicResource AccentPurpleBrush}" CornerRadius="2"
-                                        HorizontalAlignment="Left" x:Name="MemBar"/>
+                                        HorizontalAlignment="Left">
+                                    <Border.Width>
+                                        <MultiBinding Converter="{StaticResource RatioToWidth}">
+                                            <Binding Path="MemUsage"/>
+                                            <Binding Path="ActualWidth" ElementName="MemBarContainer"/>
+                                        </MultiBinding>
+                                    </Border.Width>
+                                </Border>
                             </Grid>
                             <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0">
                                 <TextBlock FontSize="14" FontWeight="Bold"
@@ -186,6 +230,24 @@
                         Background="Transparent" Foreground="{DynamicResource TextSecondaryBrush}"
                         BorderThickness="0" IsHitTestVisible="True"/>
             </StackPanel>
+
+            <!-- Error Overlay: Visible when IsError == true -->
+            <Border Background="{DynamicResource MiniBgBrush}" CornerRadius="14"
+                    Visibility="{Binding IsError, Converter={StaticResource BoolToVis}}"
+                    Panel.ZIndex="1" Margin="1">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="16">
+                    <TextBlock Text="⚠" FontSize="28" HorizontalAlignment="Center"
+                               Foreground="#F85149" Margin="0,0,0,6"/>
+                    <TextBlock Text="监控异常" FontSize="13" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding ErrorMessage}" FontSize="10"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center" TextWrapping="Wrap"
+                               TextAlignment="Center" MaxWidth="260"
+                               TextTrimming="CharacterEllipsis" MaxHeight="36"/>
+                </StackPanel>
+            </Border>
         </Grid>
     </Border>
 </Window>
