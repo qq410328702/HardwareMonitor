@@ -11,6 +11,8 @@ public class TempToColorConverter : IValueConverter
 {
     public object Convert(object value, Type t, object p, CultureInfo c)
     {
+        if (value == null || value == DependencyProperty.UnsetValue || value == Binding.DoNothing)
+            return new SolidColorBrush(Color.FromRgb(0x8B, 0x94, 0x9E));
         float temp = System.Convert.ToSingle(value);
         if (temp < 50) return new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50));
         if (temp < 70) return new SolidColorBrush(Color.FromRgb(0xD2, 0x99, 0x22));
@@ -24,6 +26,8 @@ public class TempToWpfColorConverter : IValueConverter
 {
     public object Convert(object value, Type t, object p, CultureInfo c)
     {
+        if (value == null || value == DependencyProperty.UnsetValue || value == Binding.DoNothing)
+            return Color.FromRgb(0x8B, 0x94, 0x9E);
         float temp = System.Convert.ToSingle(value);
         if (temp < 50) return Color.FromRgb(0x3F, 0xB9, 0x50);
         if (temp < 70) return Color.FromRgb(0xD2, 0x99, 0x22);
@@ -37,6 +41,8 @@ public class UsageToColorConverter : IValueConverter
 {
     public object Convert(object value, Type t, object p, CultureInfo c)
     {
+        if (value == null || value == DependencyProperty.UnsetValue || value == Binding.DoNothing)
+            return Color.FromRgb(0x8B, 0x94, 0x9E);
         float usage = System.Convert.ToSingle(value);
         if (usage < 50) return Color.FromRgb(0x58, 0xA6, 0xFF);
         if (usage < 80) return Color.FromRgb(0xD2, 0x99, 0x22);
@@ -49,6 +55,8 @@ public class FloatFormatConverter : IValueConverter
 {
     public object Convert(object value, Type t, object p, CultureInfo c)
     {
+        if (value == null || value == DependencyProperty.UnsetValue || value == Binding.DoNothing)
+            return "0";
         string fmt = p as string ?? "F1";
         return System.Convert.ToSingle(value).ToString(fmt);
     }
@@ -60,6 +68,9 @@ public class MemoryBarWidthConverter : IMultiValueConverter
     public object Convert(object[] values, Type t, object p, CultureInfo c)
     {
         if (values.Length < 3) return 0.0;
+        foreach (var v in values)
+            if (v == null || v == DependencyProperty.UnsetValue || v == Binding.DoNothing)
+                return 0.0;
         float used = System.Convert.ToSingle(values[0]);
         float total = System.Convert.ToSingle(values[1]);
         double maxWidth = System.Convert.ToDouble(values[2]);
@@ -112,6 +123,8 @@ public class BytesToStringConverter : IValueConverter
 {
     public object Convert(object value, Type t, object p, CultureInfo c)
     {
+        if (value == null || value == DependencyProperty.UnsetValue || value == Binding.DoNothing)
+            return "0 B";
         long bytes = System.Convert.ToInt64(value);
         if (bytes < 1024L) return $"{bytes} B";
         if (bytes < 1024L * 1024) return $"{bytes / 1024.0:F1} KB";
@@ -130,7 +143,7 @@ public class EnumEqualConverter : IValueConverter
             return new SolidColorBrush(Colors.Transparent);
         bool isMatch = value.ToString() == p.ToString();
         return isMatch
-            ? new SolidColorBrush(Color.FromArgb(0x30, 0x58, 0xA6, 0xFF))
+            ? new SolidColorBrush(Color.FromArgb(0x40, 0x58, 0xA6, 0xFF))
             : new SolidColorBrush(Colors.Transparent);
     }
     public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotImplementedException();

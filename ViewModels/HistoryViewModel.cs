@@ -1,5 +1,6 @@
 using HardwareMonitor.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,7 +28,7 @@ public class HistoryViewModel : BaseViewModel
     public bool IsLoading { get => _isLoading; set => SetField(ref _isLoading, value); }
     public string StatusMessage { get => _statusMessage; set => SetField(ref _statusMessage, value); }
 
-    public ObservableCollection<SnapshotRecord> Records { get; } = new();
+    public ObservableCollection<SnapshotRecord> Records { get; set; } = new();
 
     public HistoryViewModel(IDataStorageService storageService)
     {
@@ -46,9 +47,8 @@ public class HistoryViewModel : BaseViewModel
 
             RunOnUI(() =>
             {
-                Records.Clear();
-                foreach (var r in records)
-                    Records.Add(r);
+                Records = new ObservableCollection<SnapshotRecord>(records);
+                OnPropertyChanged(nameof(Records));
                 StatusMessage = $"共 {records.Count} 条记录";
             });
         }

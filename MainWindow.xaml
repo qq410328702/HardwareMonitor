@@ -151,12 +151,12 @@
                             </Border.Style>
                             <StackPanel HorizontalAlignment="Center">
                                 <TextBlock Text="CPU 温度" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                           FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,4"/>
                                 <ctrl:ArcGauge Width="130" Height="130"
                                     Value="{Binding CpuTemp}" MaxValue="100" Unit="°C" Label="TEMP"
                                     AccentColor="{Binding CpuTemp, Converter={StaticResource TempWpfColor}}"/>
                                 <TextBlock Text="{Binding CpuName}" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="10" HorizontalAlignment="Center" Margin="0,2,0,0"
+                                           FontSize="12" HorizontalAlignment="Center" Margin="0,2,0,0"
                                            TextTrimming="CharacterEllipsis" MaxWidth="160"/>
                             </StackPanel>
                         </Border>
@@ -182,12 +182,12 @@
                             </Border.Style>
                             <StackPanel HorizontalAlignment="Center">
                                 <TextBlock Text="GPU 温度" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                           FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,4"/>
                                 <ctrl:ArcGauge Width="130" Height="130"
                                     Value="{Binding GpuTemp}" MaxValue="100" Unit="°C" Label="TEMP"
                                     AccentColor="{Binding GpuTemp, Converter={StaticResource TempWpfColor}}"/>
                                 <TextBlock Text="{Binding GpuName}" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="10" HorizontalAlignment="Center" Margin="0,2,0,0"
+                                           FontSize="12" HorizontalAlignment="Center" Margin="0,2,0,0"
                                            TextTrimming="CharacterEllipsis" MaxWidth="160"/>
                             </StackPanel>
                         </Border>
@@ -202,12 +202,12 @@
                                 Padding="12" MinWidth="170">
                             <StackPanel HorizontalAlignment="Center">
                                 <TextBlock Text="内存使用率" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                           FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,4"/>
                                 <ctrl:ArcGauge Width="130" Height="130"
                                     Value="{Binding MemUsage}" MaxValue="100" Unit="%" Label="RAM"
                                     AccentColor="{DynamicResource AccentPurple}"/>
                                 <TextBlock Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="10" HorizontalAlignment="Center" Margin="0,2,0,0">
+                                           FontSize="12" HorizontalAlignment="Center" Margin="0,2,0,0">
                                     <Run Text="{Binding MemUsed, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
                                     <Run Text="/"/>
                                     <Run Text="{Binding MemTotal, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
@@ -226,7 +226,7 @@
                                 Padding="12" MinWidth="170" MinHeight="100">
                             <StackPanel>
                                 <TextBlock Text="磁盘监控" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                           FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,8"/>
                                 <ItemsControl ItemsSource="{Binding DiskSnapshots}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -237,36 +237,36 @@
                                                         <Ellipse Width="8" Height="8" Margin="0,0,6,0"
                                                                  Fill="{Binding Health, Converter={StaticResource DiskHealthBrush}}"
                                                                  VerticalAlignment="Center"/>
-                                                        <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
+                                                        <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource TextPrimaryBrush}"
                                                                    TextTrimming="CharacterEllipsis"/>
                                                     </DockPanel>
                                                     <UniformGrid Columns="3">
                                                         <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="温度" FontSize="10"
+                                                            <TextBlock Text="温度" FontSize="12"
                                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                                        HorizontalAlignment="Center"/>
-                                                            <TextBlock FontSize="12" HorizontalAlignment="Center"
+                                                            <TextBlock FontSize="14" HorizontalAlignment="Center"
                                                                        Foreground="{Binding Temperature, Converter={StaticResource TempColor}}">
                                                                 <Run Text="{Binding Temperature, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
                                                                 <Run Text="°C"/>
                                                             </TextBlock>
                                                         </StackPanel>
                                                         <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="读取" FontSize="10"
+                                                            <TextBlock Text="读取" FontSize="12"
                                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                                        HorizontalAlignment="Center"/>
-                                                            <TextBlock FontSize="12" HorizontalAlignment="Center"
+                                                            <TextBlock FontSize="14" HorizontalAlignment="Center"
                                                                        Foreground="{DynamicResource TextPrimaryBrush}">
                                                                 <Run Text="{Binding ReadSpeed, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
                                                                 <Run Text="MB/s"/>
                                                             </TextBlock>
                                                         </StackPanel>
                                                         <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="写入" FontSize="10"
+                                                            <TextBlock Text="写入" FontSize="12"
                                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                                        HorizontalAlignment="Center"/>
-                                                            <TextBlock FontSize="12" HorizontalAlignment="Center"
+                                                            <TextBlock FontSize="14" HorizontalAlignment="Center"
                                                                        Foreground="{DynamicResource TextPrimaryBrush}">
                                                                 <Run Text="{Binding WriteSpeed, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
                                                                 <Run Text="MB/s"/>
@@ -291,32 +291,32 @@
                                 Padding="12" MinWidth="170" MinHeight="100">
                             <StackPanel>
                                 <TextBlock Text="网络监控" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                           FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,8"/>
                                 <ItemsControl ItemsSource="{Binding NetworkSnapshots}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
                                                     Padding="4,6" Margin="0,0,0,4">
                                                 <StackPanel>
-                                                    <TextBlock Text="{Binding AdapterName}" FontSize="12" FontWeight="SemiBold"
+                                                    <TextBlock Text="{Binding AdapterName}" FontSize="14" FontWeight="SemiBold"
                                                                Foreground="{DynamicResource TextPrimaryBrush}"
                                                                TextTrimming="CharacterEllipsis" Margin="0,0,0,4"/>
                                                     <UniformGrid Columns="2" Margin="0,0,0,4">
                                                         <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="↑ 上传" FontSize="10"
+                                                            <TextBlock Text="↑ 上传" FontSize="12"
                                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                                        HorizontalAlignment="Center"/>
-                                                            <TextBlock FontSize="12" HorizontalAlignment="Center"
+                                                            <TextBlock FontSize="14" HorizontalAlignment="Center"
                                                                        Foreground="{DynamicResource TextPrimaryBrush}">
                                                                 <Run Text="{Binding UploadSpeedKBps, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
                                                                 <Run Text="KB/s"/>
                                                             </TextBlock>
                                                         </StackPanel>
                                                         <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="↓ 下载" FontSize="10"
+                                                            <TextBlock Text="↓ 下载" FontSize="12"
                                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                                        HorizontalAlignment="Center"/>
-                                                            <TextBlock FontSize="12" HorizontalAlignment="Center"
+                                                            <TextBlock FontSize="14" HorizontalAlignment="Center"
                                                                        Foreground="{DynamicResource TextPrimaryBrush}">
                                                                 <Run Text="{Binding DownloadSpeedKBps, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
                                                                 <Run Text="KB/s"/>
@@ -325,18 +325,18 @@
                                                     </UniformGrid>
                                                     <UniformGrid Columns="2">
                                                         <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="累计发送" FontSize="10"
+                                                            <TextBlock Text="累计发送" FontSize="12"
                                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                                        HorizontalAlignment="Center"/>
-                                                            <TextBlock FontSize="11" HorizontalAlignment="Center"
+                                                            <TextBlock FontSize="13" HorizontalAlignment="Center"
                                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                                        Text="{Binding TotalBytesSent, Converter={StaticResource BytesToStr}}"/>
                                                         </StackPanel>
                                                         <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="累计接收" FontSize="10"
+                                                            <TextBlock Text="累计接收" FontSize="12"
                                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                                        HorizontalAlignment="Center"/>
-                                                            <TextBlock FontSize="11" HorizontalAlignment="Center"
+                                                            <TextBlock FontSize="13" HorizontalAlignment="Center"
                                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                                        Text="{Binding TotalBytesReceived, Converter={StaticResource BytesToStr}}"/>
                                                         </StackPanel>
@@ -358,15 +358,15 @@
                         <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                 Padding="12" MinWidth="260" MinHeight="100">
                             <StackPanel>
-                                <!-- Header with sort toggle buttons -->
+                                <!-- Header with tab-style sort buttons -->
                                 <DockPanel Margin="0,0,0,8">
                                     <TextBlock Text="进程监控" Foreground="{DynamicResource TextSecondaryBrush}"
-                                               FontSize="12" VerticalAlignment="Center"/>
+                                               FontSize="14" VerticalAlignment="Center"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                         <Button Content="CPU" Click="ProcessSort_Click" Style="{x:Null}"
-                                                Width="40" Height="22" FontSize="10" Cursor="Hand"
-                                                BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}"
-                                                Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,4,0">
+                                                Width="60" Height="30" FontSize="13" FontWeight="SemiBold" Cursor="Hand"
+                                                BorderThickness="0,0,0,3" Margin="0,0,4,0"
+                                                Foreground="{DynamicResource TextPrimaryBrush}">
                                             <Button.Background>
                                                 <Binding Path="ProcessSortMode" Converter="{StaticResource EnumEqual}" ConverterParameter="ByCpu">
                                                     <Binding.FallbackValue>
@@ -374,11 +374,18 @@
                                                     </Binding.FallbackValue>
                                                 </Binding>
                                             </Button.Background>
+                                            <Button.BorderBrush>
+                                                <Binding Path="ProcessSortMode" Converter="{StaticResource EnumEqual}" ConverterParameter="ByCpu">
+                                                    <Binding.FallbackValue>
+                                                        <SolidColorBrush Color="Transparent"/>
+                                                    </Binding.FallbackValue>
+                                                </Binding>
+                                            </Button.BorderBrush>
                                             <Button.Tag>ByCpu</Button.Tag>
                                         </Button>
                                         <Button Content="内存" Click="ProcessSort_Click" Style="{x:Null}"
-                                                Width="40" Height="22" FontSize="10" Cursor="Hand"
-                                                BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}"
+                                                Width="60" Height="30" FontSize="13" FontWeight="SemiBold" Cursor="Hand"
+                                                BorderThickness="0,0,0,3"
                                                 Foreground="{DynamicResource TextPrimaryBrush}">
                                             <Button.Background>
                                                 <Binding Path="ProcessSortMode" Converter="{StaticResource EnumEqual}" ConverterParameter="ByMemory">
@@ -387,6 +394,13 @@
                                                     </Binding.FallbackValue>
                                                 </Binding>
                                             </Button.Background>
+                                            <Button.BorderBrush>
+                                                <Binding Path="ProcessSortMode" Converter="{StaticResource EnumEqual}" ConverterParameter="ByMemory">
+                                                    <Binding.FallbackValue>
+                                                        <SolidColorBrush Color="Transparent"/>
+                                                    </Binding.FallbackValue>
+                                                </Binding>
+                                            </Button.BorderBrush>
                                             <Button.Tag>ByMemory</Button.Tag>
                                         </Button>
                                     </StackPanel>
@@ -400,13 +414,13 @@
                                         <ColumnDefinition Width="55"/>
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="名称" FontSize="10"
+                                    <TextBlock Grid.Column="0" Text="名称" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                    <TextBlock Grid.Column="1" Text="PID" FontSize="10"
+                                    <TextBlock Grid.Column="1" Text="PID" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
-                                    <TextBlock Grid.Column="2" Text="CPU%" FontSize="10"
+                                    <TextBlock Grid.Column="2" Text="CPU%" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
-                                    <TextBlock Grid.Column="3" Text="内存MB" FontSize="10"
+                                    <TextBlock Grid.Column="3" Text="内存MB" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
                                 </Grid>
 
@@ -421,17 +435,17 @@
                                                     <ColumnDefinition Width="55"/>
                                                     <ColumnDefinition Width="60"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="11"
+                                                <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="13"
                                                            Foreground="{DynamicResource TextPrimaryBrush}"
                                                            TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding Pid}" FontSize="11"
+                                                <TextBlock Grid.Column="1" Text="{Binding Pid}" FontSize="13"
                                                            Foreground="{DynamicResource TextSecondaryBrush}"
                                                            TextAlignment="Right"/>
-                                                <TextBlock Grid.Column="2" FontSize="11"
+                                                <TextBlock Grid.Column="2" FontSize="13"
                                                            Foreground="{DynamicResource TextPrimaryBrush}"
                                                            TextAlignment="Right"
                                                            Text="{Binding CpuPercent, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
-                                                <TextBlock Grid.Column="3" FontSize="11"
+                                                <TextBlock Grid.Column="3" FontSize="13"
                                                            Foreground="{DynamicResource TextPrimaryBrush}"
                                                            TextAlignment="Right"
                                                            Text="{Binding MemoryMB, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
@@ -448,7 +462,8 @@
                             Margin="4" AllowDrop="True"
                             MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
                             DragOver="Card_DragOver" Drop="Card_Drop"
-                            HorizontalAlignment="Stretch">
+                            HorizontalAlignment="Stretch"
+                            Width="{Binding ActualWidth, ElementName=CardPanel}">
                         <StackPanel>
                             <Grid Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
@@ -462,8 +477,8 @@
                                         CornerRadius="12" Padding="16">
                                     <StackPanel>
                                         <TextBlock Text="温度趋势" Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="12" Margin="0,0,0,8"/>
-                                        <lvc:CartesianChart Height="180" Series="{Binding TempSeries}"
+                                                   FontSize="14" Margin="0,0,0,8"/>
+                                        <lvc:CartesianChart Height="280" Series="{Binding TempSeries}"
                                             DrawMarginFrame="{x:Null}"
                                             TooltipPosition="Hidden"
                                             XAxes="{Binding HiddenAxes}"
@@ -477,8 +492,8 @@
                                         CornerRadius="12" Padding="16">
                                     <StackPanel>
                                         <TextBlock Text="使用率趋势" Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="12" Margin="0,0,0,8"/>
-                                        <lvc:CartesianChart Height="180" Series="{Binding UsageSeries}"
+                                                   FontSize="14" Margin="0,0,0,8"/>
+                                        <lvc:CartesianChart Height="280" Series="{Binding UsageSeries}"
                                             DrawMarginFrame="{x:Null}"
                                             TooltipPosition="Hidden"
                                             XAxes="{Binding HiddenAxes}"
@@ -498,7 +513,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" Text="GPU 显存" VerticalAlignment="Center"
-                                               Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,16,0"/>
+                                               Foreground="{DynamicResource TextSecondaryBrush}" FontSize="14" Margin="0,0,16,0"/>
                                     <Grid Grid.Column="1" VerticalAlignment="Center" x:Name="GpuMemBarContainer">
                                         <Border Background="#20888888" CornerRadius="4" Height="8"/>
                                         <Border CornerRadius="4" Height="8" HorizontalAlignment="Left">
@@ -518,7 +533,7 @@
                                         </Border>
                                     </Grid>
                                     <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="16,0,0,0"
-                                               Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12">
+                                               Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14">
                                         <Run Text="{Binding GpuMemUsed, Converter={StaticResource FloatFmt}, ConverterParameter=F0, Mode=OneWay}"/>
                                         <Run Text="/" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         <Run Text="{Binding GpuMemTotal, Converter={StaticResource FloatFmt}, ConverterParameter=F0, Mode=OneWay}"/>
@@ -541,10 +556,10 @@
                                 <!-- Header -->
                                 <DockPanel Margin="0,0,0,10">
                                     <TextBlock Text="历史数据" Foreground="{DynamicResource TextSecondaryBrush}"
-                                               FontSize="12" VerticalAlignment="Center"/>
+                                               FontSize="14" VerticalAlignment="Center"/>
                                     <Button Content="📥 导出 CSV" Click="ExportCsv_Click" Style="{x:Null}"
                                             HorizontalAlignment="Right"
-                                            Height="26" Padding="10,0" FontSize="11" Cursor="Hand"
+                                            Height="28" Padding="10,0" FontSize="13" Cursor="Hand"
                                             Background="{DynamicResource AccentGreenBrush}"
                                             Foreground="White" BorderThickness="0"
                                             ToolTip="导出当前时间范围的数据为 CSV 文件"/>
@@ -552,33 +567,33 @@
 
                                 <!-- Time range selector -->
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                    <TextBlock Text="时间范围:" FontSize="11"
+                                    <TextBlock Text="时间范围:" FontSize="13"
                                                Foreground="{DynamicResource TextSecondaryBrush}"
                                                VerticalAlignment="Center" Margin="0,0,8,0"/>
                                     <Button Content="1小时" Tag="1h" Click="HistoryRange_Click" Style="{x:Null}"
-                                            Width="52" Height="24" FontSize="10" Cursor="Hand"
+                                            Width="56" Height="26" FontSize="12" Cursor="Hand"
                                             BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}"
                                             Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,4,0"
                                             Background="Transparent"/>
                                     <Button Content="24小时" Tag="24h" Click="HistoryRange_Click" Style="{x:Null}"
-                                            Width="52" Height="24" FontSize="10" Cursor="Hand"
+                                            Width="56" Height="26" FontSize="12" Cursor="Hand"
                                             BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}"
                                             Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,4,0"
                                             Background="Transparent"/>
                                     <Button Content="7天" Tag="7d" Click="HistoryRange_Click" Style="{x:Null}"
-                                            Width="52" Height="24" FontSize="10" Cursor="Hand"
+                                            Width="56" Height="26" FontSize="12" Cursor="Hand"
                                             BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}"
                                             Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,4,0"
                                             Background="Transparent"/>
                                     <Button Content="30天" Tag="30d" Click="HistoryRange_Click" Style="{x:Null}"
-                                            Width="52" Height="24" FontSize="10" Cursor="Hand"
+                                            Width="56" Height="26" FontSize="12" Cursor="Hand"
                                             BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}"
                                             Foreground="{DynamicResource TextPrimaryBrush}"
                                             Background="Transparent"/>
                                 </StackPanel>
 
                                 <!-- Status message -->
-                                <TextBlock Text="{Binding HistoryStatus}" FontSize="10"
+                                <TextBlock Text="{Binding HistoryStatus}" FontSize="12"
                                            Foreground="{DynamicResource TextSecondaryBrush}"
                                            Margin="0,0,0,8"/>
 
@@ -593,63 +608,82 @@
                                         <ColumnDefinition Width="60"/>
                                         <ColumnDefinition Width="60"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="时间" FontSize="10"
+                                    <TextBlock Grid.Column="0" Text="时间" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                    <TextBlock Grid.Column="1" Text="CPU温度" FontSize="10"
+                                    <TextBlock Grid.Column="1" Text="CPU温度" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
-                                    <TextBlock Grid.Column="2" Text="CPU%" FontSize="10"
+                                    <TextBlock Grid.Column="2" Text="CPU%" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
-                                    <TextBlock Grid.Column="3" Text="GPU温度" FontSize="10"
+                                    <TextBlock Grid.Column="3" Text="GPU温度" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
-                                    <TextBlock Grid.Column="4" Text="GPU%" FontSize="10"
+                                    <TextBlock Grid.Column="4" Text="GPU%" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
-                                    <TextBlock Grid.Column="5" Text="内存%" FontSize="10"
+                                    <TextBlock Grid.Column="5" Text="内存%" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
-                                    <TextBlock Grid.Column="6" Text="功耗W" FontSize="10"
+                                    <TextBlock Grid.Column="6" Text="功耗W" FontSize="12"
                                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
                                 </Grid>
 
-                                <!-- Scrollable record list (max height) -->
-                                <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
-                                    <ItemsControl ItemsSource="{Binding HistoryRecords}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid Margin="0,2">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="140"/>
-                                                        <ColumnDefinition Width="60"/>
-                                                        <ColumnDefinition Width="60"/>
-                                                        <ColumnDefinition Width="60"/>
-                                                        <ColumnDefinition Width="60"/>
-                                                        <ColumnDefinition Width="60"/>
-                                                        <ColumnDefinition Width="60"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock Grid.Column="0" FontSize="10"
-                                                               Foreground="{DynamicResource TextPrimaryBrush}"
-                                                               Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm:ss}'}"/>
-                                                    <TextBlock Grid.Column="1" FontSize="10" TextAlignment="Right"
-                                                               Foreground="{DynamicResource TextPrimaryBrush}"
-                                                               Text="{Binding CpuTemp, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
-                                                    <TextBlock Grid.Column="2" FontSize="10" TextAlignment="Right"
-                                                               Foreground="{DynamicResource TextPrimaryBrush}"
-                                                               Text="{Binding CpuUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
-                                                    <TextBlock Grid.Column="3" FontSize="10" TextAlignment="Right"
-                                                               Foreground="{DynamicResource TextPrimaryBrush}"
-                                                               Text="{Binding GpuTemp, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
-                                                    <TextBlock Grid.Column="4" FontSize="10" TextAlignment="Right"
-                                                               Foreground="{DynamicResource TextPrimaryBrush}"
-                                                               Text="{Binding GpuUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
-                                                    <TextBlock Grid.Column="5" FontSize="10" TextAlignment="Right"
-                                                               Foreground="{DynamicResource TextPrimaryBrush}"
-                                                               Text="{Binding MemUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
-                                                    <TextBlock Grid.Column="6" FontSize="10" TextAlignment="Right"
-                                                               Foreground="{DynamicResource TextPrimaryBrush}"
-                                                               Text="{Binding TotalPower, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </ScrollViewer>
+                                <!-- Scrollable record list (max height, virtualized) -->
+                                <ListView MaxHeight="300" ItemsSource="{Binding HistoryRecords}"
+                                          Background="Transparent" BorderThickness="0"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                          VirtualizingStackPanel.IsVirtualizing="True"
+                                          VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                          ScrollViewer.CanContentScroll="True">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ListViewItem">
+                                                        <ContentPresenter/>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="140"/>
+                                                    <ColumnDefinition Width="60"/>
+                                                    <ColumnDefinition Width="60"/>
+                                                    <ColumnDefinition Width="60"/>
+                                                    <ColumnDefinition Width="60"/>
+                                                    <ColumnDefinition Width="60"/>
+                                                    <ColumnDefinition Width="60"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" FontSize="12"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                                           Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm:ss}'}"/>
+                                                <TextBlock Grid.Column="1" FontSize="12" TextAlignment="Right"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                                           Text="{Binding CpuTemp, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
+                                                <TextBlock Grid.Column="2" FontSize="12" TextAlignment="Right"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                                           Text="{Binding CpuUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
+                                                <TextBlock Grid.Column="3" FontSize="12" TextAlignment="Right"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                                           Text="{Binding GpuTemp, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
+                                                <TextBlock Grid.Column="4" FontSize="12" TextAlignment="Right"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                                           Text="{Binding GpuUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
+                                                <TextBlock Grid.Column="5" FontSize="12" TextAlignment="Right"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                                           Text="{Binding MemUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
+                                                <TextBlock Grid.Column="6" FontSize="12" TextAlignment="Right"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                                           Text="{Binding TotalPower, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
                             </StackPanel>
                         </Border>
                     </Border>
@@ -665,7 +699,7 @@
                             <StackPanel>
                                 <!-- Header -->
                                 <TextBlock Text="告警规则配置" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="12" Margin="0,0,0,10"/>
+                                           FontSize="14" Margin="0,0,0,10"/>
 
                                 <!-- Add rule form -->
                                 <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
@@ -676,12 +710,12 @@
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="指标:" FontSize="11" VerticalAlignment="Center"
+                                            <TextBlock Text="指标:" FontSize="13" VerticalAlignment="Center"
                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                        Margin="0,0,8,0"/>
                                             <ComboBox Grid.Column="1" ItemsSource="{Binding MetricTypes}"
                                                       SelectedItem="{Binding NewRuleMetric}"
-                                                      Height="26" FontSize="11">
+                                                      Height="28" FontSize="13">
                                                 <ComboBox.ItemTemplate>
                                                     <DataTemplate>
                                                         <TextBlock Text="{Binding Converter={StaticResource MetricDisplay}}"/>
@@ -695,13 +729,13 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="阈值:" FontSize="11" VerticalAlignment="Center"
+                                            <TextBlock Text="阈值:" FontSize="13" VerticalAlignment="Center"
                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                        Margin="0,0,8,0"/>
                                             <TextBox Grid.Column="1" Text="{Binding NewRuleThreshold, UpdateSourceTrigger=PropertyChanged}"
-                                                     Height="26" FontSize="11" Padding="4,2"
+                                                     Height="28" FontSize="13" Padding="4,2"
                                                      VerticalContentAlignment="Center"/>
-                                            <TextBlock Grid.Column="2" FontSize="11" VerticalAlignment="Center"
+                                            <TextBlock Grid.Column="2" FontSize="13" VerticalAlignment="Center"
                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                        Margin="6,0,0,0"
                                                        Text="{Binding NewRuleMetric, Converter={StaticResource MetricUnit}}"/>
@@ -711,12 +745,12 @@
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="方向:" FontSize="11" VerticalAlignment="Center"
+                                            <TextBlock Text="方向:" FontSize="13" VerticalAlignment="Center"
                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                        Margin="0,0,8,0"/>
                                             <ComboBox Grid.Column="1" ItemsSource="{Binding CompareDirections}"
                                                       SelectedItem="{Binding NewRuleDirection}"
-                                                      Height="26" FontSize="11">
+                                                      Height="28" FontSize="13">
                                                 <ComboBox.ItemTemplate>
                                                     <DataTemplate>
                                                         <TextBlock Text="{Binding Converter={StaticResource DirectionDisplay}}"/>
@@ -725,7 +759,7 @@
                                             </ComboBox>
                                         </Grid>
                                         <Button Content="➕ 添加规则" Click="AddAlertRule_Click" Style="{x:Null}"
-                                                Height="28" Padding="12,0" FontSize="11" Cursor="Hand"
+                                                Height="30" Padding="12,0" FontSize="13" Cursor="Hand"
                                                 Background="{DynamicResource AccentGreenBrush}"
                                                 Foreground="White" BorderThickness="0"
                                                 HorizontalAlignment="Left" Margin="0,4,0,0"/>
@@ -733,7 +767,7 @@
                                 </Border>
 
                                 <!-- Status message -->
-                                <TextBlock Text="{Binding AlertRuleStatus}" FontSize="10"
+                                <TextBlock Text="{Binding AlertRuleStatus}" FontSize="12"
                                            Foreground="{DynamicResource TextSecondaryBrush}"
                                            Margin="0,0,0,6"/>
 
@@ -746,19 +780,19 @@
                                                 <DockPanel>
                                                     <Button Content="✕" Click="RemoveAlertRule_Click" Style="{x:Null}"
                                                             DockPanel.Dock="Right"
-                                                            Width="24" Height="24" FontSize="10" Cursor="Hand"
+                                                            Width="26" Height="26" FontSize="12" Cursor="Hand"
                                                             Background="Transparent"
                                                             Foreground="#F85149" BorderThickness="0"
                                                             ToolTip="删除此规则"
                                                             Tag="{Binding}"/>
                                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                        <TextBlock FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}"
+                                                        <TextBlock FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}"
                                                                    Text="{Binding Metric, Converter={StaticResource MetricDisplay}}"/>
-                                                        <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"
+                                                        <TextBlock FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"
                                                                    Margin="6,0" Text="{Binding Direction, Converter={StaticResource DirectionDisplay}}"/>
-                                                        <TextBlock FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}"
+                                                        <TextBlock FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}"
                                                                    Text="{Binding Threshold, StringFormat='{}{0:F1}'}"/>
-                                                        <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"
+                                                        <TextBlock FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"
                                                                    Margin="2,0,0,0"
                                                                    Text="{Binding Metric, Converter={StaticResource MetricUnit}}"/>
                                                     </StackPanel>
@@ -781,8 +815,8 @@
                                 Padding="16" MinWidth="200">
                             <StackPanel>
                                 <TextBlock Text="布局设置" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="12" Margin="0,0,0,10"/>
-                                <TextBlock Text="显示/隐藏卡片:" FontSize="11"
+                                           FontSize="14" Margin="0,0,0,10"/>
+                                <TextBlock Text="显示/隐藏卡片:" FontSize="13"
                                            Foreground="{DynamicResource TextSecondaryBrush}"
                                            Margin="0,0,0,6"/>
                                 <ItemsControl x:Name="LayoutCardList">
@@ -793,7 +827,7 @@
                                                       Unchecked="LayoutCard_Toggled"
                                                       Margin="0,3" Cursor="Hand">
                                                 <TextBlock Text="{Binding CardId, Converter={StaticResource CardIdDisplay}}"
-                                                           FontSize="11"
+                                                           FontSize="13"
                                                            Foreground="{DynamicResource TextPrimaryBrush}"/>
                                             </CheckBox>
                                         </DataTemplate>
