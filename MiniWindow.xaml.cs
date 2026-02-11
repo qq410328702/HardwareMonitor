@@ -40,23 +40,27 @@ namespace HardwareMonitor
 
         private void DragArea_MouseRightDown(object sender, MouseButtonEventArgs e)
         {
-            Close();
+            // Minimize to tray instead of closing
+            Hide();
         }
 
         private void Expand_Click(object sender, RoutedEventArgs e)
         {
             ExpandRequested?.Invoke(this, EventArgs.Empty);
-            Close();
+            Hide();
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            // Minimize to tray instead of exiting
+            Hide();
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            base.OnClosing(e);
+            // Cancel close and hide to tray instead
+            e.Cancel = true;
+            Hide();
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -86,3 +87,126 @@ public class RatioToWidthConverter : IMultiValueConverter
         => throw new NotSupportedException();
 }
 
+
+public class DiskHealthStatusToBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type t, object p, CultureInfo c)
+    {
+        if (value is HardwareMonitor.Services.DiskHealthStatus status)
+        {
+            return status switch
+            {
+                Services.DiskHealthStatus.Healthy => new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50)),
+                Services.DiskHealthStatus.Warning => new SolidColorBrush(Color.FromRgb(0xD2, 0x99, 0x22)),
+                Services.DiskHealthStatus.Critical => new SolidColorBrush(Color.FromRgb(0xF8, 0x51, 0x49)),
+                _ => new SolidColorBrush(Color.FromRgb(0x8B, 0x94, 0x9E))
+            };
+        }
+        return new SolidColorBrush(Color.FromRgb(0x8B, 0x94, 0x9E));
+    }
+    public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotImplementedException();
+}
+
+
+public class BytesToStringConverter : IValueConverter
+{
+    public object Convert(object value, Type t, object p, CultureInfo c)
+    {
+        long bytes = System.Convert.ToInt64(value);
+        if (bytes < 1024L) return $"{bytes} B";
+        if (bytes < 1024L * 1024) return $"{bytes / 1024.0:F1} KB";
+        if (bytes < 1024L * 1024 * 1024) return $"{bytes / (1024.0 * 1024):F1} MB";
+        return $"{bytes / (1024.0 * 1024 * 1024):F2} GB";
+    }
+    public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotImplementedException();
+}
+
+
+public class EnumEqualConverter : IValueConverter
+{
+    public object Convert(object value, Type t, object p, CultureInfo c)
+    {
+        if (value == null || p == null)
+            return new SolidColorBrush(Colors.Transparent);
+        bool isMatch = value.ToString() == p.ToString();
+        return isMatch
+            ? new SolidColorBrush(Color.FromArgb(0x30, 0x58, 0xA6, 0xFF))
+            : new SolidColorBrush(Colors.Transparent);
+    }
+    public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotImplementedException();
+}
+
+public class MetricTypeDisplayConverter : IValueConverter
+{
+    public object Convert(object value, Type t, object p, CultureInfo c)
+    {
+        if (value is HardwareMonitor.Services.MetricType metric)
+        {
+            return metric switch
+            {
+                Services.MetricType.CpuTemp => "CPU 温度",
+                Services.MetricType.GpuTemp => "GPU 温度",
+                Services.MetricType.CpuUsage => "CPU 使用率",
+                Services.MetricType.GpuUsage => "GPU 使用率",
+                _ => metric.ToString()
+            };
+        }
+        return value?.ToString() ?? "";
+    }
+    public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotImplementedException();
+}
+
+public class CompareDirectionDisplayConverter : IValueConverter
+{
+    public object Convert(object value, Type t, object p, CultureInfo c)
+    {
+        if (value is HardwareMonitor.Services.CompareDirection dir)
+        {
+            return dir switch
+            {
+                Services.CompareDirection.Above => "高于",
+                Services.CompareDirection.Below => "低于",
+                _ => dir.ToString()
+            };
+        }
+        return value?.ToString() ?? "";
+    }
+    public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotImplementedException();
+}
+
+public class MetricTypeUnitConverter : IValueConverter
+{
+    public object Convert(object value, Type t, object p, CultureInfo c)
+    {
+        if (value is HardwareMonitor.Services.MetricType metric)
+        {
+            return metric is Services.MetricType.CpuTemp or Services.MetricType.GpuTemp ? "°C" : "%";
+        }
+        return "";
+    }
+    public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotImplementedException();
+}
+
+public class CardIdToDisplayNameConverter : IValueConverter
+{
+    private static readonly Dictionary<string, string> DisplayNames = new()
+    {
+        ["cpu"] = "CPU 温度",
+        ["gpu"] = "GPU 温度",
+        ["memory"] = "内存使用率",
+        ["disk"] = "磁盘监控",
+        ["network"] = "网络监控",
+        ["process"] = "进程监控",
+        ["charts"] = "图表趋势",
+        ["history"] = "历史数据",
+        ["alert"] = "告警规则"
+    };
+
+    public object Convert(object value, Type t, object p, CultureInfo c)
+    {
+        if (value is string cardId && DisplayNames.TryGetValue(cardId, out var name))
+            return name;
+        return value?.ToString() ?? "";
+    }
+    public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotImplementedException();
+}

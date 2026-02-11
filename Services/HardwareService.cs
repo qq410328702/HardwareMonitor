@@ -42,7 +42,8 @@ public class HardwareService : IDisposable
                 {
                     IsCpuEnabled = true,
                     IsGpuEnabled = true,
-                    IsMemoryEnabled = true
+                    IsMemoryEnabled = true,
+                    IsStorageEnabled = true
                 };
                 c.Open();
 
@@ -94,6 +95,17 @@ public class HardwareService : IDisposable
 
             _ready = true;
         });
+    }
+    /// <summary>
+    /// Exposes the Computer instance for other services (e.g. DiskMonitorService)
+    /// that need to iterate over hardware directly.
+    /// </summary>
+    public Computer? GetComputer()
+    {
+        lock (_syncLock)
+        {
+            return _computer;
+        }
     }
 
     public virtual HardwareSnapshot GetSnapshot()

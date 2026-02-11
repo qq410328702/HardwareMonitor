@@ -1,7 +1,8 @@
 <Application x:Class="HardwareMonitor.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Startup="App_Startup">
+             Startup="App_Startup"
+             ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
         <!-- Default: Light theme -->
         <Color x:Key="BgDark">#FFF5F5F5</Color>
