@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ctrl="clr-namespace:HardwareMonitor.Controls"
         xmlns:conv="clr-namespace:HardwareMonitor.Converters"
+        xmlns:piw="clr-namespace:PhosphorIconsWpf.Markup;assembly=PhosphorIconsWpf"
         Title="Hardware Monitor" Icon="Resources/AppIcon.ico" Width="980" Height="720"
         MinWidth="800" MinHeight="600"
         Background="{DynamicResource BgDarkBrush}"
@@ -19,6 +20,24 @@
             <conv:TempToWpfColorConverter x:Key="TempWpfColor"/>
             <conv:FloatFormatConverter x:Key="FloatFmt"/>
             <conv:RatioToWidthConverter x:Key="RatioToWidth"/>
+
+            <Style x:Key="IconPathStyle" TargetType="{x:Type Path}">
+                <Setter Property="Width" Value="16"/>
+                <Setter Property="Height" Value="16"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+                <Setter Property="Fill" Value="{DynamicResource TextSecondaryBrush}"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+            </Style>
+
+            <Style x:Key="CardIconPathStyle" TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}">
+                <Setter Property="Width" Value="18"/>
+                <Setter Property="Height" Value="18"/>
+            </Style>
+
+            <Style x:Key="ButtonIconPathStyle" TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}">
+                <Setter Property="Width" Value="13"/>
+                <Setter Property="Height" Value="13"/>
+            </Style>
 
             <Style x:Key="ElectricityTextBoxStyle" TargetType="{x:Type TextBox}">
                 <Setter Property="Background" Value="{DynamicResource MiniCardBrush}"/>
@@ -58,7 +77,9 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Margin="16,0,0,0" VerticalAlignment="Center">
-                    <Ellipse Width="10" Height="10" Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,6,0"/>
+                    <Path Data="{piw:IconGeometry Icon=gauge, IconType=regular}"
+                          Style="{StaticResource IconPathStyle}"
+                          Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,7,0"/>
                     <TextBlock Text="Hardware Monitor" Foreground="{DynamicResource TextPrimaryBrush}"
                                FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
@@ -68,18 +89,24 @@
                               SelectedIndex="{Binding ThemeIndex}"
                               Width="80" Height="24" FontSize="11" VerticalAlignment="Center"
                               Margin="0,0,4,0" ToolTip="切换主题"/>
-                    <Button Content="🔽" Click="MiniMode_Click" Style="{x:Null}"
-                            Width="36" Height="28" FontSize="11" ToolTip="切换悬浮窗"
-                            Background="Transparent" Foreground="{DynamicResource TextSecondaryBrush}"
-                            BorderThickness="0" Cursor="Hand"/>
-                    <Button Content="─" Click="Minimize_Click" Style="{x:Null}"
-                            Width="36" Height="28" FontSize="12"
-                            Background="Transparent" Foreground="{DynamicResource TextSecondaryBrush}"
-                            BorderThickness="0" Cursor="Hand"/>
-                    <Button Content="✕" Click="Close_Click" Style="{x:Null}"
-                            Width="36" Height="28" FontSize="12"
-                            Background="Transparent" Foreground="{DynamicResource TextSecondaryBrush}"
-                            BorderThickness="0" Cursor="Hand"/>
+                    <Button Click="MiniMode_Click" Style="{x:Null}"
+                            Width="36" Height="28" ToolTip="切换悬浮窗"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand">
+                        <Path Data="{piw:IconGeometry Icon=arrows_in, IconType=bold}"
+                              Style="{StaticResource ButtonIconPathStyle}"/>
+                    </Button>
+                    <Button Click="Minimize_Click" Style="{x:Null}"
+                            Width="36" Height="28" ToolTip="最小化"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand">
+                        <Path Data="{piw:IconGeometry Icon=minus, IconType=bold}"
+                              Style="{StaticResource ButtonIconPathStyle}"/>
+                    </Button>
+                    <Button Click="Close_Click" Style="{x:Null}"
+                            Width="36" Height="28" ToolTip="关闭"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand">
+                        <Path Data="{piw:IconGeometry Icon=x, IconType=bold}"
+                              Style="{StaticResource ButtonIconPathStyle}"/>
+                    </Button>
                 </StackPanel>
             </Grid>
 
@@ -87,8 +114,9 @@
                     Visibility="{Binding IsError, Converter={StaticResource BoolToVis}}"
                     Background="{DynamicResource BgDarkBrush}" Panel.ZIndex="2">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="40">
-                    <TextBlock Text="⚠" FontSize="48" HorizontalAlignment="Center"
-                               Foreground="#F85149" Margin="0,0,0,16"/>
+                    <Path Data="{piw:IconGeometry Icon=warning_circle, IconType=regular}"
+                          Width="48" Height="48" Stretch="Uniform"
+                          Fill="{DynamicResource AccentRedBrush}" Margin="0,0,0,16"/>
                     <TextBlock Text="硬件监控初始化失败" FontSize="18" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
                                HorizontalAlignment="Center" Margin="0,0,0,12"/>
@@ -144,15 +172,25 @@
 
                 <StackPanel x:Name="DashboardGroups">
                     <StackPanel x:Name="HardwareGroup" Margin="0,0,0,12">
-                        <TextBlock Text="硬件概览" Foreground="{DynamicResource TextSecondaryBrush}"
-                                   FontSize="13" FontWeight="SemiBold" Margin="4,0,0,6"/>
+                        <StackPanel Orientation="Horizontal" Margin="4,0,0,6">
+                            <Path Data="{piw:IconGeometry Icon=cpu, IconType=regular}"
+                                  Style="{StaticResource IconPathStyle}"
+                                  Fill="{DynamicResource AccentBlueBrush}" Margin="0,0,6,0"/>
+                            <TextBlock Text="硬件概览" Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
                         <WrapPanel x:Name="HardwareCardPanel" Orientation="Horizontal">
                             <Border x:Name="Card_cpu" Tag="cpu" Background="Transparent" Margin="4">
                                 <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                         Padding="12" MinWidth="170">
                                     <StackPanel HorizontalAlignment="Center">
-                                        <TextBlock Text="CPU 温度" Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                            <Path Data="{piw:IconGeometry Icon=cpu, IconType=regular}"
+                                                  Style="{StaticResource IconPathStyle}"
+                                                  Fill="{DynamicResource AccentBlueBrush}" Margin="0,0,5,0"/>
+                                            <TextBlock Text="CPU 温度" Foreground="{DynamicResource TextSecondaryBrush}"
+                                                       FontSize="14" VerticalAlignment="Center"/>
+                                        </StackPanel>
                                         <ctrl:ArcGauge Width="130" Height="130"
                                                        Value="{Binding CpuTemp}" MaxValue="100" Unit="°C" Label="TEMP"
                                                        AccentColor="{Binding CpuTemp, Converter={StaticResource TempWpfColor}}"/>
@@ -167,8 +205,13 @@
                                 <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                         Padding="12" MinWidth="170">
                                     <StackPanel HorizontalAlignment="Center">
-                                        <TextBlock Text="GPU 温度" Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                            <Path Data="{piw:IconGeometry Icon=graphics_card, IconType=regular}"
+                                                  Style="{StaticResource IconPathStyle}"
+                                                  Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,5,0"/>
+                                            <TextBlock Text="GPU 温度" Foreground="{DynamicResource TextSecondaryBrush}"
+                                                       FontSize="14" VerticalAlignment="Center"/>
+                                        </StackPanel>
                                         <ctrl:ArcGauge Width="130" Height="130"
                                                        Value="{Binding GpuTemp}" MaxValue="100" Unit="°C" Label="TEMP"
                                                        AccentColor="{Binding GpuTemp, Converter={StaticResource TempWpfColor}}"/>
@@ -183,8 +226,13 @@
                                 <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                         Padding="12" MinWidth="170">
                                     <StackPanel HorizontalAlignment="Center">
-                                        <TextBlock Text="内存使用率" Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                            <Path Data="{piw:IconGeometry Icon=memory, IconType=regular}"
+                                                  Style="{StaticResource IconPathStyle}"
+                                                  Fill="{DynamicResource AccentPurpleBrush}" Margin="0,0,5,0"/>
+                                            <TextBlock Text="内存使用率" Foreground="{DynamicResource TextSecondaryBrush}"
+                                                       FontSize="14" VerticalAlignment="Center"/>
+                                        </StackPanel>
                                         <ctrl:ArcGauge Width="130" Height="130"
                                                        Value="{Binding MemUsage}" MaxValue="100" Unit="%" Label="RAM"
                                                        AccentColor="{DynamicResource AccentPurple}"/>
@@ -202,8 +250,13 @@
                     </StackPanel>
 
                     <StackPanel x:Name="PowerGroup" Margin="0,0,0,12">
-                        <TextBlock Text="功耗统计" Foreground="{DynamicResource TextSecondaryBrush}"
-                                   FontSize="13" FontWeight="SemiBold" Margin="4,0,0,6"/>
+                        <StackPanel Orientation="Horizontal" Margin="4,0,0,6">
+                            <Path Data="{piw:IconGeometry Icon=lightning, IconType=regular}"
+                                  Style="{StaticResource IconPathStyle}"
+                                  Fill="{DynamicResource AccentOrangeBrush}" Margin="0,0,6,0"/>
+                            <TextBlock Text="功耗统计" Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
                         <WrapPanel x:Name="PowerCardPanel" Orientation="Horizontal">
                             <Border x:Name="Card_power" Tag="power" Background="Transparent" Margin="4">
                                 <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
@@ -215,8 +268,13 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel>
-                                                <TextBlock Text="总功耗" Foreground="{DynamicResource TextSecondaryBrush}"
-                                                           FontSize="14" FontWeight="SemiBold"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{piw:IconGeometry Icon=plug_charging, IconType=regular}"
+                                                          Style="{StaticResource IconPathStyle}"
+                                                          Fill="{DynamicResource AccentOrangeBrush}" Margin="0,0,6,0"/>
+                                                    <TextBlock Text="总功耗" Foreground="{DynamicResource TextSecondaryBrush}"
+                                                               FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                </StackPanel>
                                                 <TextBlock Text="{Binding PowerSourceText}" Foreground="{DynamicResource TextSecondaryBrush}"
                                                            FontSize="11" Margin="0,2,0,0"/>
                                             </StackPanel>
@@ -331,8 +389,13 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel>
-                                                <TextBlock Text="电费统计" Foreground="{DynamicResource TextPrimaryBrush}"
-                                                           FontSize="13" FontWeight="SemiBold"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{piw:IconGeometry Icon=currency_cny, IconType=regular}"
+                                                          Style="{StaticResource IconPathStyle}"
+                                                          Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,6,0"/>
+                                                    <TextBlock Text="电费统计" Foreground="{DynamicResource TextPrimaryBrush}"
+                                                               FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                </StackPanel>
                                                 <TextBlock Text="{Binding ElectricityStatus}" Foreground="{DynamicResource TextSecondaryBrush}"
                                                            FontSize="11" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
                                             </StackPanel>
@@ -405,9 +468,13 @@
                                                                  Style="{StaticResource ElectricityTextBoxStyle}" Margin="0,0,5,0"/>
                                                         <TextBox Grid.Column="3" Text="{Binding RateYuanPerKwh, UpdateSourceTrigger=PropertyChanged}"
                                                                  Style="{StaticResource ElectricityTextBoxStyle}" Margin="0,0,5,0"/>
-                                                        <Button Grid.Column="4" Content="删" Click="RemoveElectricityTariff_Click"
+                                                        <Button Grid.Column="4" Click="RemoveElectricityTariff_Click"
                                                                 Style="{StaticResource ElectricityButtonStyle}" Padding="0"
-                                                                ToolTip="删除时段"/>
+                                                                ToolTip="删除时段">
+                                                            <Path Data="{piw:IconGeometry Icon=trash, IconType=bold}"
+                                                                  Style="{StaticResource ButtonIconPathStyle}"
+                                                                  Fill="{DynamicResource AccentRedBrush}"/>
+                                                        </Button>
                                                     </Grid>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
@@ -422,12 +489,30 @@
                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                                <Button Content="新增时段" Click="AddElectricityTariff_Click"
-                                                        Style="{StaticResource ElectricityButtonStyle}" Margin="0,0,5,0"/>
-                                                <Button Content="恢复默认" Click="RestoreElectricityTariffs_Click"
-                                                        Style="{StaticResource ElectricityButtonStyle}" Margin="0,0,5,0"/>
-                                                <Button Content="保存电价" Click="SaveElectricityTariffs_Click"
-                                                        Style="{StaticResource ElectricityButtonStyle}"/>
+                                                <Button Click="AddElectricityTariff_Click"
+                                                        Style="{StaticResource ElectricityButtonStyle}" Margin="0,0,5,0">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Path Data="{piw:IconGeometry Icon=plus, IconType=bold}"
+                                                              Style="{StaticResource ButtonIconPathStyle}" Margin="0,0,4,0"/>
+                                                        <TextBlock Text="新增时段" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button Click="RestoreElectricityTariffs_Click"
+                                                        Style="{StaticResource ElectricityButtonStyle}" Margin="0,0,5,0">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Path Data="{piw:IconGeometry Icon=arrow_counter_clockwise, IconType=bold}"
+                                                              Style="{StaticResource ButtonIconPathStyle}" Margin="0,0,4,0"/>
+                                                        <TextBlock Text="恢复默认" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button Click="SaveElectricityTariffs_Click"
+                                                        Style="{StaticResource ElectricityButtonStyle}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Path Data="{piw:IconGeometry Icon=floppy_disk, IconType=bold}"
+                                                              Style="{StaticResource ButtonIconPathStyle}" Margin="0,0,4,0"/>
+                                                        <TextBlock Text="保存电价" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>
@@ -437,8 +522,13 @@
                     </StackPanel>
 
                     <StackPanel x:Name="StorageGroup" Margin="0,0,0,12">
-                        <TextBlock Text="存储设备" Foreground="{DynamicResource TextSecondaryBrush}"
-                                   FontSize="13" FontWeight="SemiBold" Margin="4,0,0,6"/>
+                        <StackPanel Orientation="Horizontal" Margin="4,0,0,6">
+                            <Path Data="{piw:IconGeometry Icon=hard_drives, IconType=regular}"
+                                  Style="{StaticResource IconPathStyle}"
+                                  Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,6,0"/>
+                            <TextBlock Text="存储设备" Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
                         <WrapPanel x:Name="StorageCardPanel" Orientation="Horizontal"/>
                     </StackPanel>
                 </StackPanel>

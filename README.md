@@ -39,6 +39,7 @@
 ### 使用体验
 
 - 主窗口按类型分组展示：硬件概览、功耗统计、存储设备
+- 主窗口和悬浮窗使用 Phosphor 风格线性矢量图标
 - 悬浮窗模式：置顶展示核心数据，支持拖拽移动
 - 系统托盘：显示/隐藏主窗口、打开悬浮窗、开机自启、退出
 - 自带应用图标，已应用到 exe、主窗口、悬浮窗和托盘
@@ -65,6 +66,7 @@
 |------|------|
 | .NET 8 WPF | 桌面 UI 框架 |
 | LibreHardwareMonitor | CPU / GPU / 内存 / 磁盘 / 功耗传感器读取 |
+| PhosphorIconsWpf | Phosphor 风格 WPF 矢量图标 |
 | Windows Forms NotifyIcon | 系统托盘 |
 | MVVM + partial 拆分 | 窗口和 ViewModel 按功能组织 |
 

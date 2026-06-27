@@ -1,11 +1,20 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:conv="clr-namespace:HardwareMonitor.Converters">
+                    xmlns:conv="clr-namespace:HardwareMonitor.Converters"
+                    xmlns:piw="clr-namespace:PhosphorIconsWpf.Markup;assembly=PhosphorIconsWpf">
     <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     <conv:TempToColorConverter x:Key="TempColor"/>
     <conv:FloatFormatConverter x:Key="FloatFmt"/>
     <conv:RatioToWidthConverter x:Key="RatioToWidth"/>
     <conv:DiskHealthStatusToBrushConverter x:Key="DiskHealthBrush"/>
+
+    <Style x:Key="DiskIconPathStyle" TargetType="{x:Type Path}">
+        <Setter Property="Width" Value="15"/>
+        <Setter Property="Height" Value="15"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="Fill" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
 
     <DataTemplate x:Key="DiskCardContentTemplate">
         <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
@@ -14,49 +23,77 @@
                 <Grid Margin="0,0,0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+                    <Path Data="{piw:IconGeometry Icon=hard_drive, IconType=regular}"
+                          Style="{StaticResource DiskIconPathStyle}"
+                          Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,6,0"
+                          VerticalAlignment="Center"/>
                     <Ellipse Width="8" Height="8" Margin="0,0,6,0"
                              Fill="{Binding Health, Converter={StaticResource DiskHealthBrush}}"
+                             Grid.Column="1"
                              VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
+                    <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
                                TextTrimming="CharacterEllipsis"/>
                 </Grid>
                 <TextBlock Text="{Binding DiskMetaText}" FontSize="11"
                            Foreground="{DynamicResource TextSecondaryBrush}"
-                           TextTrimming="CharacterEllipsis" Margin="14,0,0,7"/>
+                           TextTrimming="CharacterEllipsis" Margin="29,0,0,7"/>
 
                 <UniformGrid Columns="4" Margin="0,0,0,6">
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="状态" FontSize="12"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Path Data="{piw:IconGeometry Icon=check_circle, IconType=regular}"
+                                  Style="{StaticResource DiskIconPathStyle}"
+                                  Fill="{Binding Health, Converter={StaticResource DiskHealthBrush}}"
+                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                            <TextBlock Text="状态" FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
                         <TextBlock Text="{Binding LifetimeStatusText}" FontSize="13"
                                    Foreground="{Binding Health, Converter={StaticResource DiskHealthBrush}}"
                                    HorizontalAlignment="Center"
                                    TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="剩余寿命" FontSize="12"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Path Data="{piw:IconGeometry Icon=battery_high, IconType=regular}"
+                                  Style="{StaticResource DiskIconPathStyle}"
+                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                            <TextBlock Text="剩余寿命" FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
                         <TextBlock Text="{Binding LifeRemainingDisplay}" FontSize="13"
                                    Foreground="{Binding Health, Converter={StaticResource DiskHealthBrush}}"
                                    HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="已用寿命" FontSize="12"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Path Data="{piw:IconGeometry Icon=chart_pie_slice, IconType=regular}"
+                                  Style="{StaticResource DiskIconPathStyle}"
+                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                            <TextBlock Text="已用寿命" FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
                         <TextBlock Text="{Binding LifeUsedDisplay}" FontSize="13"
                                    Foreground="{DynamicResource TextPrimaryBrush}"
                                    HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="温度" FontSize="12"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Path Data="{piw:IconGeometry Icon=thermometer, IconType=regular}"
+                                  Style="{StaticResource DiskIconPathStyle}"
+                                  Fill="{Binding Temperature, Converter={StaticResource TempColor}}"
+                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                            <TextBlock Text="温度" FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
                         <TextBlock FontSize="13" HorizontalAlignment="Center"
                                    Foreground="{Binding Temperature, Converter={StaticResource TempColor}}">
                             <Run Text="{Binding Temperature, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
@@ -81,9 +118,15 @@
 
                 <UniformGrid Columns="3" Margin="0,0,0,8">
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="读取" FontSize="12"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Path Data="{piw:IconGeometry Icon=arrow_down, IconType=regular}"
+                                  Style="{StaticResource DiskIconPathStyle}"
+                                  Fill="{DynamicResource AccentBlueBrush}"
+                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                            <TextBlock Text="读取" FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
                         <TextBlock FontSize="13" HorizontalAlignment="Center"
                                    Foreground="{DynamicResource TextPrimaryBrush}">
                             <Run Text="{Binding ReadSpeed, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
@@ -91,9 +134,15 @@
                         </TextBlock>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="写入" FontSize="12"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Path Data="{piw:IconGeometry Icon=arrow_up, IconType=regular}"
+                                  Style="{StaticResource DiskIconPathStyle}"
+                                  Fill="{DynamicResource AccentOrangeBrush}"
+                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                            <TextBlock Text="写入" FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
                         <TextBlock FontSize="13" HorizontalAlignment="Center"
                                    Foreground="{DynamicResource TextPrimaryBrush}">
                             <Run Text="{Binding WriteSpeed, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
@@ -101,9 +150,14 @@
                         </TextBlock>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="备用空间" FontSize="12"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   HorizontalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Path Data="{piw:IconGeometry Icon=battery_charging, IconType=regular}"
+                                  Style="{StaticResource DiskIconPathStyle}"
+                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                            <TextBlock Text="备用空间" FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
                         <TextBlock Text="{Binding AvailableSpareDisplay}" FontSize="13"
                                    Foreground="{DynamicResource TextPrimaryBrush}"
                                    HorizontalAlignment="Center"/>
