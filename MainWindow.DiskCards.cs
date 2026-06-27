@@ -93,14 +93,9 @@ public partial class MainWindow
             Tag = cardId,
             Background = Brushes.Transparent,
             Margin = new Thickness(4),
-            AllowDrop = true,
             Child = content
         };
 
-        card.MouseMove += Card_MouseMove;
-        card.DragEnter += Card_DragEnter;
-        card.DragOver += Card_DragOver;
-        card.Drop += Card_Drop;
         return card;
     }
 }

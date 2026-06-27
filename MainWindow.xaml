@@ -135,14 +135,16 @@
                     </Style>
                 </ScrollViewer.Style>
 
-                <!-- Draggable card container -->
-                <WrapPanel x:Name="CardPanel" Orientation="Horizontal">
+                <!-- Grouped dashboard card containers -->
+                <StackPanel x:Name="DashboardGroups">
+                    <StackPanel x:Name="HardwareGroup" Margin="0,0,0,12">
+                        <TextBlock Text="硬件概览" Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontSize="13" FontWeight="SemiBold" Margin="4,0,0,6"/>
+                        <WrapPanel x:Name="HardwareCardPanel" Orientation="Horizontal">
 
                     <!-- CPU Card -->
                     <Border x:Name="Card_cpu" Tag="cpu" Background="Transparent"
-                            Margin="4" AllowDrop="True"
-                            MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
-                            DragOver="Card_DragOver" Drop="Card_Drop">
+                            Margin="4">
                         <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                 Padding="12" MinWidth="170">
                             <Border.Style>
@@ -171,9 +173,7 @@
 
                     <!-- GPU Card -->
                     <Border x:Name="Card_gpu" Tag="gpu" Background="Transparent"
-                            Margin="4" AllowDrop="True"
-                            MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
-                            DragOver="Card_DragOver" Drop="Card_Drop">
+                            Margin="4">
                         <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                 Padding="12" MinWidth="170">
                             <Border.Style>
@@ -202,9 +202,7 @@
 
                     <!-- Memory Card -->
                     <Border x:Name="Card_memory" Tag="memory" Background="Transparent"
-                            Margin="4" AllowDrop="True"
-                            MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
-                            DragOver="Card_DragOver" Drop="Card_Drop">
+                            Margin="4">
                         <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                 Padding="12" MinWidth="170">
                             <StackPanel HorizontalAlignment="Center">
@@ -224,11 +222,23 @@
                         </Border>
                     </Border>
 
+                        </WrapPanel>
+                    </StackPanel>
+
+                    <StackPanel x:Name="StorageGroup" Margin="0,0,0,12">
+                        <TextBlock Text="存储设备" Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontSize="13" FontWeight="SemiBold" Margin="4,0,0,6"/>
+                        <WrapPanel x:Name="StorageCardPanel" Orientation="Horizontal"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="ToolsGroup">
+                        <TextBlock Text="运行与工具" Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontSize="13" FontWeight="SemiBold" Margin="4,0,0,6"/>
+                        <WrapPanel x:Name="ToolsCardPanel" Orientation="Horizontal">
+
                     <!-- Network Card -->
                     <Border x:Name="Card_network" Tag="network" Background="Transparent"
-                            Margin="4" AllowDrop="True"
-                            MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
-                            DragOver="Card_DragOver" Drop="Card_Drop">
+                            Margin="4">
                         <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                 Padding="12" MinWidth="170" MinHeight="100">
                             <StackPanel>
@@ -294,9 +304,7 @@
 
                     <!-- Process Card -->
                     <Border x:Name="Card_process" Tag="process" Background="Transparent"
-                            Margin="4" AllowDrop="True"
-                            MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
-                            DragOver="Card_DragOver" Drop="Card_Drop">
+                            Margin="4">
                         <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                 Padding="12" MinWidth="260" MinHeight="100">
                             <StackPanel>
@@ -401,11 +409,9 @@
 
                     <!-- Charts Card -->
                     <Border x:Name="Card_charts" Tag="charts" Background="Transparent"
-                            Margin="4" AllowDrop="True"
-                            MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
-                            DragOver="Card_DragOver" Drop="Card_Drop"
+                            Margin="4"
                             HorizontalAlignment="Stretch"
-                            Width="{Binding ActualWidth, ElementName=CardPanel}">
+                            Width="{Binding ActualWidth, ElementName=ToolsCardPanel}">
                         <StackPanel>
                             <Grid Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
@@ -488,9 +494,7 @@
 
                     <!-- History Card -->
                     <Border x:Name="Card_history" Tag="history" Background="Transparent"
-                            Margin="4" AllowDrop="True"
-                            MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
-                            DragOver="Card_DragOver" Drop="Card_Drop"
+                            Margin="4"
                             HorizontalAlignment="Stretch">
                         <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                 Padding="16" MinWidth="400">
@@ -632,9 +636,7 @@
 
                     <!-- Alert Config Card -->
                     <Border x:Name="Card_alert" Tag="alert" Background="Transparent"
-                            Margin="4" AllowDrop="True"
-                            MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
-                            DragOver="Card_DragOver" Drop="Card_Drop"
+                            Margin="4"
                             HorizontalAlignment="Stretch">
                         <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                 Padding="16" MinWidth="320">
@@ -749,9 +751,7 @@
 
                     <!-- Layout Settings Card -->
                     <Border x:Name="Card_layout" Tag="layout" Background="Transparent"
-                            Margin="4" AllowDrop="True"
-                            MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
-                            DragOver="Card_DragOver" Drop="Card_Drop"
+                            Margin="4"
                             HorizontalAlignment="Stretch">
                         <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
                                 Padding="16" MinWidth="200">
@@ -779,7 +779,9 @@
                         </Border>
                     </Border>
 
-                </WrapPanel>
+                        </WrapPanel>
+                    </StackPanel>
+                </StackPanel>
             </ScrollViewer>
         </Grid>
     </Border>
