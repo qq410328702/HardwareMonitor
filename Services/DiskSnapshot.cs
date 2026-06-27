@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 
@@ -6,8 +7,10 @@ namespace HardwareMonitor.Services;
 
 public enum DiskHealthStatus { Healthy, Warning, Critical }
 
-public class DiskSnapshot
+public class DiskSnapshot : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public string LayoutCardId { get; set; } = "";
     public string Name { get; set; } = "";
     public float Temperature { get; set; }
@@ -87,6 +90,37 @@ public class DiskSnapshot
     private static string FormatPercent(float? value) => value.HasValue ? $"{value.Value:F0}%" : "--";
     private static string FormatTb(double? value) => value.HasValue ? $"{value.Value:F1} TB" : "--";
     private static string FormatCount(long? value) => value.HasValue ? value.Value.ToString("N0", CultureInfo.CurrentCulture) : "--";
+
+    internal void UpdateFrom(DiskSnapshot source)
+    {
+        LayoutCardId = source.LayoutCardId;
+        Name = source.Name;
+        Temperature = source.Temperature;
+        ReadSpeed = source.ReadSpeed;
+        WriteSpeed = source.WriteSpeed;
+        Health = source.Health;
+        LifeUsedPercent = source.LifeUsedPercent;
+        LifeRemainingPercent = source.LifeRemainingPercent;
+        AvailableSparePercent = source.AvailableSparePercent;
+        AvailableSpareThresholdPercent = source.AvailableSpareThresholdPercent;
+        CriticalWarning = source.CriticalWarning;
+        TotalReadTb = source.TotalReadTb;
+        TotalWrittenTb = source.TotalWrittenTb;
+        PowerOnHours = source.PowerOnHours;
+        PowerCycleCount = source.PowerCycleCount;
+        UnsafeShutdownCount = source.UnsafeShutdownCount;
+        MediaErrorCount = source.MediaErrorCount;
+        ErrorLogEntryCount = source.ErrorLogEntryCount;
+        WarningTemperatureMinutes = source.WarningTemperatureMinutes;
+        CriticalTemperatureMinutes = source.CriticalTemperatureMinutes;
+        DriveLetters = source.DriveLetters;
+        BusType = source.BusType;
+        MediaType = source.MediaType;
+        LifetimeStatusText = source.LifetimeStatusText;
+        LifetimeUnavailableReason = source.LifetimeUnavailableReason;
+
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
+    }
 
     private static string FormatMinutes(long? minutes)
     {

@@ -1,6 +1,7 @@
 using HardwareMonitor.Services;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace HardwareMonitor.ViewModels;
 
@@ -26,22 +27,62 @@ public partial class MainViewModel
 
     private void ApplyDiskSnapshots(List<DiskSnapshot> disks)
     {
-        DiskSnapshots.Clear();
-        foreach (var d in disks)
-            DiskSnapshots.Add(d);
+        var incomingIds = disks
+            .Where(d => !string.IsNullOrWhiteSpace(d.LayoutCardId))
+            .Select(d => d.LayoutCardId)
+            .ToHashSet();
+
+        for (int i = DiskSnapshots.Count - 1; i >= 0; i--)
+        {
+            if (!incomingIds.Contains(DiskSnapshots[i].LayoutCardId))
+                DiskSnapshots.RemoveAt(i);
+        }
+
+        for (int i = 0; i < disks.Count; i++)
+        {
+            var incoming = disks[i];
+            var existingIndex = IndexOfDisk(incoming.LayoutCardId);
+            if (existingIndex >= 0)
+            {
+                DiskSnapshots[existingIndex].UpdateFrom(incoming);
+                if (existingIndex != i && i < DiskSnapshots.Count)
+                    DiskSnapshots.Move(existingIndex, i);
+            }
+            else
+            {
+                DiskSnapshots.Insert(System.Math.Min(i, DiskSnapshots.Count), incoming);
+            }
+        }
     }
 
     private void ApplyNetworkSnapshots(List<NetworkSnapshot> nets)
     {
-        NetworkSnapshots.Clear();
-        foreach (var n in nets)
-            NetworkSnapshots.Add(n);
+        ReplaceCollection(NetworkSnapshots, nets);
     }
 
     private void ApplyTopProcesses(List<ProcessInfo> procs)
     {
-        TopProcesses.Clear();
-        foreach (var p in procs)
-            TopProcesses.Add(p);
+        ReplaceCollection(TopProcesses, procs);
+    }
+
+    private int IndexOfDisk(string layoutCardId)
+    {
+        for (int i = 0; i < DiskSnapshots.Count; i++)
+            if (DiskSnapshots[i].LayoutCardId == layoutCardId)
+                return i;
+        return -1;
+    }
+
+    private static void ReplaceCollection<T>(ObservableCollection<T> target, IReadOnlyList<T> source)
+    {
+        int commonCount = System.Math.Min(target.Count, source.Count);
+        for (int i = 0; i < commonCount; i++)
+            target[i] = source[i];
+
+        for (int i = commonCount; i < source.Count; i++)
+            target.Add(source[i]);
+
+        for (int i = target.Count - 1; i >= source.Count; i--)
+            target.RemoveAt(i);
     }
 }

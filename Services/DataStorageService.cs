@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 
@@ -29,7 +30,11 @@ public interface IDataStorageService : IDisposable
 
 public class DataStorageService : IDataStorageService
 {
+    private const int WriteBatchSize = 5;
+
     private readonly SqliteConnection _connection;
+    private readonly SemaphoreSlim _dbLock = new(1, 1);
+    private readonly List<PendingSnapshot> _pendingSnapshots = new();
     private bool _disposed;
 
     public DataStorageService(string? connectionString = null)
@@ -68,50 +73,60 @@ public class DataStorageService : IDataStorageService
 
     public async Task SaveSnapshotAsync(HardwareSnapshot snapshot)
     {
-        using var cmd = _connection.CreateCommand();
-        cmd.CommandText = @"
-            INSERT INTO snapshots (timestamp, cpu_temp, cpu_usage, gpu_temp, gpu_usage, mem_usage, total_power)
-            VALUES (@timestamp, @cpuTemp, @cpuUsage, @gpuTemp, @gpuUsage, @memUsage, @totalPower)";
+        await _dbLock.WaitAsync();
+        try
+        {
+            if (_disposed)
+                return;
 
-        cmd.Parameters.AddWithValue("@timestamp", DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture));
-        cmd.Parameters.AddWithValue("@cpuTemp", snapshot.CpuTemp);
-        cmd.Parameters.AddWithValue("@cpuUsage", snapshot.CpuUsage);
-        cmd.Parameters.AddWithValue("@gpuTemp", snapshot.GpuTemp);
-        cmd.Parameters.AddWithValue("@gpuUsage", snapshot.GpuUsage);
-        cmd.Parameters.AddWithValue("@memUsage", snapshot.MemUsage);
-        cmd.Parameters.AddWithValue("@totalPower", snapshot.CpuPower + snapshot.GpuPower);
-
-        await cmd.ExecuteNonQueryAsync();
+            _pendingSnapshots.Add(PendingSnapshot.From(snapshot));
+            if (_pendingSnapshots.Count >= WriteBatchSize)
+                FlushPendingSnapshotsCore();
+        }
+        finally
+        {
+            _dbLock.Release();
+        }
     }
 
     public async Task<List<SnapshotRecord>> QueryAsync(DateTime from, DateTime to)
     {
         var records = new List<SnapshotRecord>();
 
-        using var cmd = _connection.CreateCommand();
-        cmd.CommandText = @"
-            SELECT id, timestamp, cpu_temp, cpu_usage, gpu_temp, gpu_usage, mem_usage, total_power
-            FROM snapshots
-            WHERE timestamp BETWEEN @from AND @to
-            ORDER BY timestamp ASC";
-
-        cmd.Parameters.AddWithValue("@from", from.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture));
-        cmd.Parameters.AddWithValue("@to", to.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture));
-
-        using var reader = await cmd.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
+        await _dbLock.WaitAsync();
+        try
         {
-            records.Add(new SnapshotRecord
+            FlushPendingSnapshotsCore();
+
+            using var cmd = _connection.CreateCommand();
+            cmd.CommandText = @"
+                SELECT id, timestamp, cpu_temp, cpu_usage, gpu_temp, gpu_usage, mem_usage, total_power
+                FROM snapshots
+                WHERE timestamp BETWEEN @from AND @to
+                ORDER BY timestamp ASC";
+
+            cmd.Parameters.AddWithValue("@from", from.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture));
+            cmd.Parameters.AddWithValue("@to", to.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture));
+
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
-                Id = reader.GetInt64(0),
-                Timestamp = DateTime.Parse(reader.GetString(1), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind),
-                CpuTemp = reader.GetFloat(2),
-                CpuUsage = reader.GetFloat(3),
-                GpuTemp = reader.GetFloat(4),
-                GpuUsage = reader.GetFloat(5),
-                MemUsage = reader.GetFloat(6),
-                TotalPower = reader.GetFloat(7)
-            });
+                records.Add(new SnapshotRecord
+                {
+                    Id = reader.GetInt64(0),
+                    Timestamp = DateTime.Parse(reader.GetString(1), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind),
+                    CpuTemp = reader.GetFloat(2),
+                    CpuUsage = reader.GetFloat(3),
+                    GpuTemp = reader.GetFloat(4),
+                    GpuUsage = reader.GetFloat(5),
+                    MemUsage = reader.GetFloat(6),
+                    TotalPower = reader.GetFloat(7)
+                });
+            }
+        }
+        finally
+        {
+            _dbLock.Release();
         }
 
         return records;
@@ -126,21 +141,99 @@ public class DataStorageService : IDataStorageService
 
     public async Task CleanupOldDataAsync(int retentionDays = 30)
     {
-        using var cmd = _connection.CreateCommand();
-        cmd.CommandText = "DELETE FROM snapshots WHERE timestamp < @cutoff";
+        await _dbLock.WaitAsync();
+        try
+        {
+            FlushPendingSnapshotsCore();
 
-        var cutoff = DateTime.UtcNow.AddDays(-retentionDays);
-        cmd.Parameters.AddWithValue("@cutoff", cutoff.ToString("o", CultureInfo.InvariantCulture));
+            using var cmd = _connection.CreateCommand();
+            cmd.CommandText = "DELETE FROM snapshots WHERE timestamp < @cutoff";
 
-        await cmd.ExecuteNonQueryAsync();
+            var cutoff = DateTime.UtcNow.AddDays(-retentionDays);
+            cmd.Parameters.AddWithValue("@cutoff", cutoff.ToString("o", CultureInfo.InvariantCulture));
+
+            await cmd.ExecuteNonQueryAsync();
+        }
+        finally
+        {
+            _dbLock.Release();
+        }
     }
 
     public void Dispose()
     {
         if (!_disposed)
         {
-            _connection.Dispose();
-            _disposed = true;
+            _dbLock.Wait();
+            try
+            {
+                FlushPendingSnapshotsCore();
+                _connection.Dispose();
+                _disposed = true;
+            }
+            finally
+            {
+                _dbLock.Release();
+                _dbLock.Dispose();
+            }
         }
+    }
+
+    private void FlushPendingSnapshotsCore()
+    {
+        if (_pendingSnapshots.Count == 0 || _disposed)
+            return;
+
+        using var transaction = _connection.BeginTransaction();
+        using var cmd = _connection.CreateCommand();
+        cmd.Transaction = transaction;
+        cmd.CommandText = @"
+            INSERT INTO snapshots (timestamp, cpu_temp, cpu_usage, gpu_temp, gpu_usage, mem_usage, total_power)
+            VALUES (@timestamp, @cpuTemp, @cpuUsage, @gpuTemp, @gpuUsage, @memUsage, @totalPower)";
+
+        var timestamp = cmd.Parameters.Add("@timestamp", SqliteType.Text);
+        var cpuTemp = cmd.Parameters.Add("@cpuTemp", SqliteType.Real);
+        var cpuUsage = cmd.Parameters.Add("@cpuUsage", SqliteType.Real);
+        var gpuTemp = cmd.Parameters.Add("@gpuTemp", SqliteType.Real);
+        var gpuUsage = cmd.Parameters.Add("@gpuUsage", SqliteType.Real);
+        var memUsage = cmd.Parameters.Add("@memUsage", SqliteType.Real);
+        var totalPower = cmd.Parameters.Add("@totalPower", SqliteType.Real);
+
+        foreach (var snapshot in _pendingSnapshots)
+        {
+            timestamp.Value = snapshot.Timestamp.ToString("o", CultureInfo.InvariantCulture);
+            cpuTemp.Value = snapshot.CpuTemp;
+            cpuUsage.Value = snapshot.CpuUsage;
+            gpuTemp.Value = snapshot.GpuTemp;
+            gpuUsage.Value = snapshot.GpuUsage;
+            memUsage.Value = snapshot.MemUsage;
+            totalPower.Value = snapshot.TotalPower;
+            cmd.ExecuteNonQuery();
+        }
+
+        transaction.Commit();
+        _pendingSnapshots.Clear();
+    }
+
+    private sealed class PendingSnapshot
+    {
+        public DateTime Timestamp { get; init; }
+        public float CpuTemp { get; init; }
+        public float CpuUsage { get; init; }
+        public float GpuTemp { get; init; }
+        public float GpuUsage { get; init; }
+        public float MemUsage { get; init; }
+        public float TotalPower { get; init; }
+
+        public static PendingSnapshot From(HardwareSnapshot snapshot) => new()
+        {
+            Timestamp = DateTime.UtcNow,
+            CpuTemp = snapshot.CpuTemp,
+            CpuUsage = snapshot.CpuUsage,
+            GpuTemp = snapshot.GpuTemp,
+            GpuUsage = snapshot.GpuUsage,
+            MemUsage = snapshot.MemUsage,
+            TotalPower = snapshot.CpuPower + snapshot.GpuPower
+        };
     }
 }

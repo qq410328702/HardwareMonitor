@@ -48,12 +48,14 @@ public class ProcessMonitorService : IProcessMonitorService
 
         var now = DateTime.UtcNow;
         int processorCount = Environment.ProcessorCount;
+        var seenPids = new HashSet<int>();
 
         foreach (var proc in processes)
         {
             try
             {
                 var pid = proc.Id;
+                seenPids.Add(pid);
                 var name = proc.ProcessName;
                 var cpuTime = proc.TotalProcessorTime;
                 var memoryMB = (float)(proc.WorkingSet64 / (1024.0 * 1024.0));
@@ -97,6 +99,9 @@ public class ProcessMonitorService : IProcessMonitorService
                 proc.Dispose();
             }
         }
+
+        foreach (var pid in _previous.Keys.Where(pid => !seenPids.Contains(pid)).ToList())
+            _previous.Remove(pid);
 
         return SortAndTake(all, topN, sort);
     }
