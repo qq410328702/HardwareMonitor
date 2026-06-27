@@ -4,7 +4,7 @@
         xmlns:ctrl="clr-namespace:HardwareMonitor.Controls"
         xmlns:conv="clr-namespace:HardwareMonitor.Converters"
         xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
-        Title="Hardware Monitor" Width="980" Height="720"
+        Title="Hardware Monitor" Icon="Resources/AppIcon.ico" Width="980" Height="720"
         MinWidth="800" MinHeight="600"
         Background="{DynamicResource BgDarkBrush}"
         WindowStyle="None" AllowsTransparency="True"

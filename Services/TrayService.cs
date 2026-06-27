@@ -40,6 +40,7 @@ public class TrayService : ITrayService
 
     private NotifyIcon? _notifyIcon;
     private ToolStripMenuItem? _autoStartItem;
+    private Icon? _trayIcon;
     private readonly ILogger? _logger;
     private bool _disposed;
 
@@ -56,10 +57,11 @@ public class TrayService : ITrayService
     {
         try
         {
+            _trayIcon = LoadTrayIcon();
             _notifyIcon = new NotifyIcon
             {
                 Text = "HardwareMonitor",
-                Icon = SystemIcons.Application,
+                Icon = _trayIcon,
                 ContextMenuStrip = CreateContextMenu()
             };
 
@@ -70,6 +72,30 @@ public class TrayService : ITrayService
         {
             _logger?.Error("Failed to create tray icon", ex);
         }
+    }
+
+    private Icon LoadTrayIcon()
+    {
+        try
+        {
+            var resource = System.Windows.Application.GetResourceStream(
+                new Uri("pack://application:,,,/Resources/AppIcon.ico", UriKind.Absolute));
+
+            if (resource?.Stream != null)
+            {
+                using var stream = resource.Stream;
+                using var icon = new Icon(stream);
+                return (Icon)icon.Clone();
+            }
+
+            _logger?.Warn("App icon resource not found, using system tray fallback icon.");
+        }
+        catch (Exception ex)
+        {
+            _logger?.Warn($"Failed to load app tray icon: {ex.Message}");
+        }
+
+        return (Icon)SystemIcons.Application.Clone();
     }
 
     public void ShowTrayIcon()
@@ -197,5 +223,8 @@ public class TrayService : ITrayService
             _notifyIcon.Dispose();
             _notifyIcon = null;
         }
+
+        _trayIcon?.Dispose();
+        _trayIcon = null;
     }
 }
