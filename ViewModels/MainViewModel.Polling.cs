@@ -47,28 +47,14 @@ public partial class MainViewModel
     {
         while (!ct.IsCancellationRequested)
         {
-            MonitoringFrame? frame = null;
-
             try
             {
-                var sortMode = _processSortMode;
-                frame = await Task.Run(() => CaptureFrame(sortMode), ct);
+                var frame = await Task.Run(CaptureFrame, ct);
                 var uiFrame = frame;
                 RunOnUI(() =>
                 {
                     ApplyFrame(uiFrame);
                 });
-
-                if (_dataStorageService is not null && frame.HardwareSnapshot is not null)
-                {
-                    try
-                    {
-                        await _dataStorageService.SaveSnapshotAsync(frame.HardwareSnapshot);
-                    }
-                    catch (Exception)
-                    {
-                    }
-                }
             }
             catch (OperationCanceledException) { throw; }
             catch (Exception)
@@ -83,7 +69,7 @@ public partial class MainViewModel
         }
     }
 
-    private MonitoringFrame CaptureFrame(ProcessSortMode processSortMode)
+    private MonitoringFrame CaptureFrame()
     {
         var frame = new MonitoringFrame();
 
@@ -106,28 +92,6 @@ public partial class MainViewModel
             }
         }
 
-        if (_networkService is not null)
-        {
-            try
-            {
-                frame.NetworkSnapshots = _networkService.GetNetworkSnapshots();
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        if (_processService is not null)
-        {
-            try
-            {
-                frame.TopProcesses = _processService.GetTopProcesses(10, processSortMode);
-            }
-            catch (Exception)
-            {
-            }
-        }
-
         return frame;
     }
 
@@ -136,17 +100,10 @@ public partial class MainViewModel
         if (frame.HardwareSnapshot is not null)
         {
             ApplySnapshot(frame.HardwareSnapshot);
-            EvaluateAlerts(frame.HardwareSnapshot);
         }
 
         if (frame.DiskSnapshots is not null)
             ApplyDiskSnapshots(frame.DiskSnapshots);
-
-        if (frame.NetworkSnapshots is not null)
-            ApplyNetworkSnapshots(frame.NetworkSnapshots);
-
-        if (frame.TopProcesses is not null)
-            ApplyTopProcesses(frame.TopProcesses);
     }
 
     private static void RunOnUI(Action action)
@@ -162,7 +119,5 @@ public partial class MainViewModel
     {
         public HardwareSnapshot? HardwareSnapshot { get; set; }
         public List<DiskSnapshot>? DiskSnapshots { get; set; }
-        public List<NetworkSnapshot>? NetworkSnapshots { get; set; }
-        public List<ProcessInfo>? TopProcesses { get; set; }
     }
 }

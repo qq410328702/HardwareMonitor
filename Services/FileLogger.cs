@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 
 namespace HardwareMonitor.Services;
 
@@ -12,7 +13,8 @@ public sealed class FileLogger : ILogger, IDisposable
     {
         Directory.CreateDirectory(logDirectory);
         var path = Path.Combine(logDirectory, $"hw-monitor-{DateTime.Now:yyyyMMdd}.log");
-        _writer = new StreamWriter(path, append: true) { AutoFlush = true };
+        var stream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+        _writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
     }
 
     public void Info(string message) => Write("INFO", message);

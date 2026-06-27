@@ -8,22 +8,6 @@ namespace HardwareMonitor.ViewModels;
 public partial class MainViewModel
 {
     public ObservableCollection<DiskSnapshot> DiskSnapshots { get; } = new();
-    public ObservableCollection<NetworkSnapshot> NetworkSnapshots { get; } = new();
-    public ObservableCollection<ProcessInfo> TopProcesses { get; } = new();
-
-    private ProcessSortMode _processSortMode = ProcessSortMode.ByCpu;
-    public ProcessSortMode ProcessSortMode
-    {
-        get => _processSortMode;
-        set => SetField(ref _processSortMode, value);
-    }
-
-    public void ToggleProcessSortMode()
-    {
-        ProcessSortMode = ProcessSortMode == ProcessSortMode.ByCpu
-            ? ProcessSortMode.ByMemory
-            : ProcessSortMode.ByCpu;
-    }
 
     private void ApplyDiskSnapshots(List<DiskSnapshot> disks)
     {
@@ -53,16 +37,6 @@ public partial class MainViewModel
                 DiskSnapshots.Insert(System.Math.Min(i, DiskSnapshots.Count), incoming);
             }
         }
-    }
-
-    private void ApplyNetworkSnapshots(List<NetworkSnapshot> nets)
-    {
-        ReplaceCollection(NetworkSnapshots, nets);
-    }
-
-    private void ApplyTopProcesses(List<ProcessInfo> procs)
-    {
-        ReplaceCollection(TopProcesses, procs);
     }
 
     private int IndexOfDisk(string layoutCardId)

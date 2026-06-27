@@ -39,6 +39,8 @@ public partial class HardwareService : IDisposable
                     IsCpuEnabled = true,
                     IsGpuEnabled = true,
                     IsMemoryEnabled = true,
+                    IsMotherboardEnabled = true,
+                    IsPsuEnabled = true,
                     IsStorageEnabled = true
                 };
                 c.Open();
@@ -121,6 +123,12 @@ public partial class HardwareService : IDisposable
             {
                 try { _memory.Update(); ReadMemory(_memory, snap); }
                 catch (Exception ex) { _logger.Warn($"内存读取失败: {ex.Message}"); }
+            }
+
+            if (_computer is not null)
+            {
+                try { ReadPowerSummary(_computer, _cpu, _gpu, _memory, snap); }
+                catch (Exception ex) { _logger.Warn($"功耗读取失败: {ex.Message}"); }
             }
         }
 

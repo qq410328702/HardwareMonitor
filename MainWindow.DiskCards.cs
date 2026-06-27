@@ -39,9 +39,6 @@ public partial class MainWindow
 
     private void RefreshDiskCards()
     {
-        if (_cardElements is null)
-            return;
-
         var disks = Vm.DiskSnapshots
             .Where(d => !string.IsNullOrWhiteSpace(d.LayoutCardId))
             .GroupBy(d => d.LayoutCardId)
@@ -54,11 +51,10 @@ public partial class MainWindow
         var currentIds = disks.Select(d => d.LayoutCardId).ToHashSet();
         foreach (var removedId in _dynamicDiskCards.Keys.Where(id => !currentIds.Contains(id)).ToList())
         {
+            StorageCardPanel.Children.Remove(_dynamicDiskCards[removedId]);
             _dynamicDiskCards.Remove(removedId);
-            _cardElements.Remove(removedId);
         }
 
-        var registrations = new List<(string CardId, string DisplayName)>();
         foreach (var disk in disks)
         {
             string cardId = disk.LayoutCardId;
@@ -66,7 +62,6 @@ public partial class MainWindow
             {
                 card = CreateDiskCard(cardId);
                 _dynamicDiskCards[cardId] = card;
-                _cardElements[cardId] = card;
             }
 
             card.Tag = cardId;
@@ -74,11 +69,9 @@ public partial class MainWindow
             if (card.Child is ContentControl content)
                 content.Content = disk;
 
-            registrations.Add((cardId, disk.LayoutDisplayName));
+            if (!StorageCardPanel.Children.Contains(card))
+                StorageCardPanel.Children.Add(card);
         }
-
-        _layoutVm?.RegisterDynamicCards(registrations);
-        ApplyLayout();
     }
 
     private Border CreateDiskCard(string cardId)

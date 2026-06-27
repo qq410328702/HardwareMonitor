@@ -1,4 +1,19 @@
+using System.Collections.Generic;
+
 namespace HardwareMonitor.Services;
+
+public sealed class PowerReading
+{
+    public string Category { get; set; } = "";
+    public string Name { get; set; } = "";
+    public float Watts { get; set; }
+    public float SharePercent { get; set; }
+    public bool IsIncludedInTotal { get; set; } = true;
+
+    public string WattsDisplay => $"{Watts:F1} W";
+    public string ShareDisplay => SharePercent > 0 ? $"{SharePercent:F0}%" : "--";
+    public string InclusionText => IsIncludedInTotal ? "计入" : "参考";
+}
 
 public class HardwareSnapshot
 {
@@ -18,4 +33,9 @@ public class HardwareSnapshot
     public float MemUsed { get; set; }
     public float MemAvailable { get; set; }
     public float MemTotal => MemUsed + MemAvailable;
+    public float TotalPower { get; set; }
+    public string PowerSourceText { get; set; } = "已检测传感器汇总";
+    public string PowerUnavailableReason { get; set; } = "";
+    public List<PowerReading> PowerReadings { get; } = new();
+    public bool HasPowerReadings => PowerReadings.Count > 0 && TotalPower > 0;
 }

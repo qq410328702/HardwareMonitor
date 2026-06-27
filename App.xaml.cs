@@ -13,8 +13,6 @@ namespace HardwareMonitor
         private MiniWindow? _miniWindow;
         private FileLogger? _logger;
         private ITrayService? _trayService;
-        private IDataStorageService? _dataStorageService;
-        private LayoutViewModel? _layoutVm;
 
         private void App_Startup(object sender, StartupEventArgs e)
         {
@@ -30,14 +28,7 @@ namespace HardwareMonitor
 
             // Create new monitoring services
             var diskService = new DiskMonitorService(hwService, _logger);
-            var networkService = new NetworkMonitorService(_logger);
-            var processService = new ProcessMonitorService(_logger);
-
-            // Create alert engine with default 60-second cooldown
-            var alertEngine = new AlertEngine();
-
-            // Create data storage service for persisting snapshots
-            _dataStorageService = new DataStorageService();
+            var electricityCostService = new ElectricityCostService();
 
             // Initialize system tray service
             _trayService = new TrayService(_logger);
@@ -45,15 +36,10 @@ namespace HardwareMonitor
             _trayService.ShowTrayIcon();
 
             // Create shared ViewModel with injected dependency
-            _vm = new MainViewModel(hwService, diskService, networkService, processService, alertEngine, _trayService, _dataStorageService);
-
-            // Create layout persistence and ViewModel
-            var layoutService = new LayoutPersistenceService();
-            _layoutVm = new LayoutViewModel(layoutService);
+            _vm = new MainViewModel(hwService, diskService, electricityCostService);
 
             // Create main window but keep it hidden
             _mainWindow = new MainWindow(_vm);
-            _mainWindow.SetLayoutViewModel(_layoutVm);
 
             // Bind tray service events
             _trayService.ShowMainRequested += (_, _) => Dispatcher.Invoke(ShowMain);
@@ -80,18 +66,11 @@ namespace HardwareMonitor
                 {
                     try
                     {
-                        _dataStorageService?.Dispose();
+                        _logger?.Dispose();
                     }
                     finally
                     {
-                        try
-                        {
-                            _logger?.Dispose();
-                        }
-                        finally
-                        {
-                            base.OnExit(e);
-                        }
+                        base.OnExit(e);
                     }
                 }
             }

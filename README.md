@@ -1,6 +1,6 @@
 # Hardware Monitor
 
-一个轻量的 Windows 硬件监控工具，基于 WPF、LibreHardwareMonitor 和 LiveCharts2 构建。它提供实时温度、使用率、功耗、磁盘 SMART/寿命、网络、进程、历史记录和告警能力，并支持悬浮窗与系统托盘常驻。
+一个轻量的 Windows 硬件监控工具，基于 WPF 和 LibreHardwareMonitor 构建。当前版本专注于核心硬件状态、真实传感器功耗统计、磁盘 SMART/寿命信息、悬浮窗和系统托盘。
 
 当前正式版：**v1.0.6**
 
@@ -12,9 +12,18 @@
 
 - CPU / GPU 温度、使用率、功耗实时监控
 - 内存使用率、已用/总量展示
-- GPU 显存占用进度条
-- CPU、GPU、内存实时趋势图
-- 分组首页布局：`硬件概览`、`存储设备`、`运行与工具`
+- GPU 显存占用读取
+- 多主题切换：深色、浅色、赛博朋克、海洋
+
+### 功耗统计
+
+- 汇总 LibreHardwareMonitor 实际读到的 `Power` 传感器
+- 优先使用 PSU 总功耗读数；没有 PSU 读数时汇总已检测硬件功耗
+- CPU / GPU 代表传感器去重，避免重复相加
+- 明细展示硬件类型、传感器名称、瓦数、计入口径
+- 基于实时总功耗统计今日、本月、总计电量和电费
+- 支持峰谷电价配置，默认全天 `0.60 元/kWh`
+- 不做固定估算；读不到时显示权限或硬件不支持提示
 
 ### 存储设备
 
@@ -27,19 +36,11 @@
   - 介质错误、错误日志、过热时间
 - SMART 不可读时会显示清晰降级提示，不影响其它监控数据
 
-### 运行与工具
-
-- 网络上传/下载速度与累计流量
-- 进程监控和排序
-- 历史数据记录、查询、CSV 导出
-- 告警规则配置和系统托盘气泡提醒
-- 布局设置：可显示/隐藏 CPU、GPU、内存、单块硬盘、网络、进程、图表、历史、告警等卡片
-
 ### 使用体验
 
+- 主窗口按类型分组展示：硬件概览、功耗统计、存储设备
 - 悬浮窗模式：置顶展示核心数据，支持拖拽移动
 - 系统托盘：显示/隐藏主窗口、打开悬浮窗、开机自启、退出
-- 多主题切换：深色、浅色、赛博朋克、海洋
 - 自带应用图标，已应用到 exe、主窗口、悬浮窗和托盘
 - 普通权限可运行；部分温度、功耗和 SMART 可靠性计数可能需要管理员权限
 
@@ -63,9 +64,7 @@
 | 组件 | 说明 |
 |------|------|
 | .NET 8 WPF | 桌面 UI 框架 |
-| LibreHardwareMonitor | CPU / GPU / 内存 / 磁盘传感器读取 |
-| LiveCharts2 + SkiaSharp | 实时趋势图表 |
-| Microsoft.Data.Sqlite | 历史数据本地存储 |
+| LibreHardwareMonitor | CPU / GPU / 内存 / 磁盘 / 功耗传感器读取 |
 | Windows Forms NotifyIcon | 系统托盘 |
 | MVVM + partial 拆分 | 窗口和 ViewModel 按功能组织 |
 
@@ -74,10 +73,10 @@
 ```text
 HardwareMonitor/
 ├── Controls/                 # 自定义控件，例如 ArcGauge 圆弧仪表盘
-├── Converters/               # 温度、格式化、磁盘、告警、布局转换器
+├── Converters/               # 温度、格式化、磁盘等转换器
 ├── Resources/                # AppIcon、磁盘卡片模板等资源
-├── Services/                 # 硬件、磁盘、网络、进程、历史、告警、托盘、主题等服务
-├── ViewModels/               # MainViewModel、布局、历史等 ViewModel
+├── Services/                 # 硬件、磁盘、托盘、主题、日志等服务
+├── ViewModels/               # MainViewModel 等 ViewModel
 ├── MainWindow*.cs/.xaml      # 主窗口与按功能拆分的 partial 代码
 ├── MiniWindow.xaml(.cs)      # 悬浮窗
 ├── App.xaml(.cs)             # 应用入口与全局资源
@@ -118,18 +117,8 @@ dotnet publish .\HardwareMonitor.csproj -c Release -r win-x64 -o .\publish
 - 主窗口：标题栏拖拽移动，点击 `🔽` 切换悬浮窗
 - 主题：通过标题栏下拉框切换
 - 托盘菜单：显示主窗口、显示迷你窗口、开机自启、退出
+- 电费统计只累计应用运行期间检测到的功耗，配置和累计数据保存在 `%LOCALAPPDATA%\HardwareMonitor\electricity.json`
 - 管理员运行可读取更多硬件传感器和 SMART 可靠性字段
-
-## 版本亮点
-
-### v1.0.6
-
-- 首页改为按类型分组展示
-- 硬盘改为一块硬盘一张卡片
-- 增强 SSD / NVMe SMART 寿命信息和不可读提示
-- 优化 1 秒刷新轮询路径，降低 UI 重排和后台调度开销
-- 增加应用图标并配置到 exe、窗口和托盘
-- 按功能拆分窗口、ViewModel、磁盘服务和转换器代码
 
 ## License
 

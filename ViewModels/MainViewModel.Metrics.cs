@@ -1,33 +1,25 @@
 using HardwareMonitor.Services;
-using LiveChartsCore;
-using LiveChartsCore.Defaults;
-using LiveChartsCore.SkiaSharpView;
-using LiveChartsCore.SkiaSharpView.Painting;
-using SkiaSharp;
 using System.Collections.ObjectModel;
 
 namespace HardwareMonitor.ViewModels;
 
 public partial class MainViewModel
 {
-    private const int MaxPoints = 60;
-
     private string _cpuName = "CPU";
     private float _cpuTemp, _cpuUsage, _cpuPower, _cpuClock;
     private string _gpuName = "GPU";
     private float _gpuTemp, _gpuUsage, _gpuPower, _gpuClock, _gpuMemUsed, _gpuMemTotal;
     private float _memUsage, _memUsed, _memTotal, _totalPower;
+    private bool _hasPowerReadings;
+    private string _powerSourceText = "已检测传感器汇总";
+    private string _powerUnavailableReason = "";
     private bool _isLoading = true;
     private bool _isError;
     private string _errorMessage = "";
     private int _pollingIntervalMs = 1000;
     private int _themeIndex;
 
-    private readonly ObservableCollection<ObservableValue> _cpuTempValues = new();
-    private readonly ObservableCollection<ObservableValue> _gpuTempValues = new();
-    private readonly ObservableCollection<ObservableValue> _cpuUsageValues = new();
-    private readonly ObservableCollection<ObservableValue> _gpuUsageValues = new();
-    private readonly ObservableCollection<ObservableValue> _memUsageValues = new();
+    public ObservableCollection<PowerReading> PowerReadings { get; } = new();
 
     public string CpuName { get => _cpuName; set => SetField(ref _cpuName, value); }
     public float CpuTemp { get => _cpuTemp; set => SetField(ref _cpuTemp, value); }
@@ -45,6 +37,9 @@ public partial class MainViewModel
     public float MemUsed { get => _memUsed; set => SetField(ref _memUsed, value); }
     public float MemTotal { get => _memTotal; set => SetField(ref _memTotal, value); }
     public float TotalPower { get => _totalPower; set => SetField(ref _totalPower, value); }
+    public bool HasPowerReadings { get => _hasPowerReadings; set => SetField(ref _hasPowerReadings, value); }
+    public string PowerSourceText { get => _powerSourceText; set => SetField(ref _powerSourceText, value); }
+    public string PowerUnavailableReason { get => _powerUnavailableReason; set => SetField(ref _powerUnavailableReason, value); }
     public bool IsLoading { get => _isLoading; set => SetField(ref _isLoading, value); }
     public bool IsError { get => _isError; set => SetField(ref _isError, value); }
     public string ErrorMessage { get => _errorMessage; set => SetField(ref _errorMessage, value); }
@@ -56,20 +51,6 @@ public partial class MainViewModel
     }
     public string[] ThemeNames => ThemeService.ThemeNames;
 
-    public ISeries[] TempSeries { get; }
-    public ISeries[] UsageSeries { get; }
-    public Axis[] HiddenAxes { get; } = [new Axis { ShowSeparatorLines = false, IsVisible = false }];
-    public Axis[] TempYAxes { get; } = [new Axis
-    {
-        MinLimit = 0, MaxLimit = 105, ShowSeparatorLines = false,
-        LabelsPaint = new SolidColorPaint(new SKColor(0x8B, 0x94, 0x9E))
-    }];
-    public Axis[] UsageYAxes { get; } = [new Axis
-    {
-        MinLimit = 0, MaxLimit = 105, ShowSeparatorLines = false,
-        LabelsPaint = new SolidColorPaint(new SKColor(0x8B, 0x94, 0x9E))
-    }];
-
     private void ApplySnapshot(HardwareSnapshot s)
     {
         CpuName = s.CpuName; CpuTemp = s.CpuTemp; CpuUsage = s.CpuUsage;
@@ -78,29 +59,11 @@ public partial class MainViewModel
         GpuPower = s.GpuPower; GpuClock = s.GpuClock;
         GpuMemUsed = s.GpuMemUsed; GpuMemTotal = s.GpuMemTotal;
         MemUsage = s.MemUsage; MemUsed = s.MemUsed; MemTotal = s.MemTotal;
-        TotalPower = s.CpuPower + s.GpuPower;
-
-        Push(_cpuTempValues, s.CpuTemp);
-        Push(_gpuTempValues, s.GpuTemp);
-        Push(_cpuUsageValues, s.CpuUsage);
-        Push(_gpuUsageValues, s.GpuUsage);
-        Push(_memUsageValues, s.MemUsage);
+        TotalPower = s.TotalPower;
+        HasPowerReadings = s.HasPowerReadings;
+        PowerSourceText = s.PowerSourceText;
+        PowerUnavailableReason = s.PowerUnavailableReason;
+        ReplaceCollection(PowerReadings, s.PowerReadings);
+        UpdateElectricityCost(s);
     }
-
-    private static void Push(ObservableCollection<ObservableValue> col, float val)
-    {
-        col.Add(new ObservableValue(val));
-        if (col.Count > MaxPoints) col.RemoveAt(0);
-    }
-
-    private static LineSeries<ObservableValue> MakeLine(
-        ObservableCollection<ObservableValue> values, string name, byte r, byte g, byte b)
-        => new()
-        {
-            Values = values, Name = name,
-            Stroke = new SolidColorPaint(new SKColor(r, g, b)) { StrokeThickness = 2 },
-            GeometrySize = 0, GeometryStroke = null, GeometryFill = null,
-            Fill = new SolidColorPaint(new SKColor(r, g, b, 0x28)),
-            LineSmoothness = 0.65
-        };
 }
