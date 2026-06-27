@@ -1,19 +1,9 @@
 using LibreHardwareMonitor.Hardware;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HardwareMonitor.Services;
-
-public enum DiskHealthStatus { Healthy, Warning, Critical }
-
-public class DiskSnapshot
-{
-    public string Name { get; set; } = "";
-    public float Temperature { get; set; }
-    public float ReadSpeed { get; set; }  // MB/s
-    public float WriteSpeed { get; set; } // MB/s
-    public DiskHealthStatus Health { get; set; }
-}
 
 public interface IDiskMonitorService
 {
@@ -22,8 +12,15 @@ public interface IDiskMonitorService
 
 public class DiskMonitorService : IDiskMonitorService
 {
+    private const int LifetimeRefreshSeconds = 30;
+
     private readonly HardwareService _hardwareService;
     private readonly ILogger _logger;
+    private readonly DiskLifetimeReader _lifetimeReader = new();
+    private readonly object _lifetimeLock = new();
+    private IReadOnlyList<DiskLifetimeInfo> _lifetimeCache = Array.Empty<DiskLifetimeInfo>();
+    private DateTime _lastLifetimeRefreshUtc = DateTime.MinValue;
+    private bool _loggedReliabilityAccessWarning;
 
     public DiskMonitorService(HardwareService hardwareService, ILogger logger)
     {
@@ -42,6 +39,8 @@ public class DiskMonitorService : IDiskMonitorService
         if (computer is null)
             return snapshots;
 
+        var lifetimeInfos = GetCachedLifetimeInfos();
+
         foreach (var hw in computer.Hardware)
         {
             if (hw.HardwareType != HardwareType.Storage)
@@ -50,7 +49,12 @@ public class DiskMonitorService : IDiskMonitorService
             try
             {
                 hw.Update();
-                var disk = ReadStorage(hw);
+                var disk = DiskSensorParser.ReadStorage(hw);
+                var lifetimeInfo = DiskLifetimeReader.FindBestMatch(hw, disk, lifetimeInfos);
+                lifetimeInfo?.ApplyTo(disk);
+
+                disk.LayoutCardId = DiskLifetimeReader.CreateLayoutCardId(hw, disk.Name, lifetimeInfo);
+                DiskHealthMapper.FinalizeLifetimeStatus(disk);
                 snapshots.Add(disk);
             }
             catch (Exception ex)
@@ -62,43 +66,33 @@ public class DiskMonitorService : IDiskMonitorService
         return snapshots;
     }
 
-    private static DiskSnapshot ReadStorage(IHardware hw)
-    {
-        var snapshot = new DiskSnapshot { Name = hw.Name };
-
-        foreach (var sensor in hw.Sensors)
-        {
-            float value = sensor.Value ?? 0;
-
-            if (sensor.SensorType == SensorType.Temperature)
-            {
-                snapshot.Temperature = value;
-            }
-            else if (sensor.SensorType == SensorType.Throughput)
-            {
-                // LibreHardwareMonitor reports throughput in bytes/s
-                if (sensor.Name.Contains("Read"))
-                    snapshot.ReadSpeed = value / (1024f * 1024f); // Convert to MB/s
-                else if (sensor.Name.Contains("Write"))
-                    snapshot.WriteSpeed = value / (1024f * 1024f); // Convert to MB/s
-            }
-        }
-
-        snapshot.Health = MapHealthStatus(snapshot.Temperature);
-        return snapshot;
-    }
-
     /// <summary>
     /// Maps disk temperature to a health status.
     /// Pure static function for easy property testing.
-    /// > 60°C = Critical, > 50°C = Warning, &lt;= 50°C = Healthy
+    /// &gt; 60°C = Critical, &gt; 50°C = Warning, &lt;= 50°C = Healthy
     /// </summary>
-    public static DiskHealthStatus MapHealthStatus(float temperature)
+    public static DiskHealthStatus MapHealthStatus(float temperature) =>
+        DiskHealthMapper.MapTemperature(temperature);
+
+    private IReadOnlyList<DiskLifetimeInfo> GetCachedLifetimeInfos()
     {
-        if (temperature > 60f)
-            return DiskHealthStatus.Critical;
-        if (temperature > 50f)
-            return DiskHealthStatus.Warning;
-        return DiskHealthStatus.Healthy;
+        lock (_lifetimeLock)
+        {
+            var now = DateTime.UtcNow;
+            if ((now - _lastLifetimeRefreshUtc).TotalSeconds < LifetimeRefreshSeconds)
+                return _lifetimeCache;
+
+            _lifetimeCache = _lifetimeReader.Read();
+            _lastLifetimeRefreshUtc = now;
+
+            if (!_loggedReliabilityAccessWarning &&
+                _lifetimeCache.Any(i => !string.IsNullOrWhiteSpace(i.ReliabilityUnavailableReason)))
+            {
+                _logger.Warn("磁盘寿命可靠性计数不可读，可能需要管理员权限或设备不支持 SMART。");
+                _loggedReliabilityAccessWarning = true;
+            }
+
+            return _lifetimeCache;
+        }
     }
 }

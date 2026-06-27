@@ -11,19 +11,26 @@
         ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-        <conv:TempToColorConverter x:Key="TempColor"/>
-        <conv:TempToWpfColorConverter x:Key="TempWpfColor"/>
-        <conv:UsageToColorConverter x:Key="UsageColor"/>
-        <conv:FloatFormatConverter x:Key="FloatFmt"/>
-        <conv:MemoryBarWidthConverter x:Key="MemBarWidth"/>
-        <conv:DiskHealthStatusToBrushConverter x:Key="DiskHealthBrush"/>
-        <conv:BytesToStringConverter x:Key="BytesToStr"/>
-        <conv:EnumEqualConverter x:Key="EnumEqual"/>
-        <conv:MetricTypeDisplayConverter x:Key="MetricDisplay"/>
-        <conv:CompareDirectionDisplayConverter x:Key="DirectionDisplay"/>
-        <conv:MetricTypeUnitConverter x:Key="MetricUnit"/>
-        <conv:CardIdToDisplayNameConverter x:Key="CardIdDisplay"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/DiskCardTemplates.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+            <conv:TempToColorConverter x:Key="TempColor"/>
+            <conv:TempToWpfColorConverter x:Key="TempWpfColor"/>
+            <conv:UsageToColorConverter x:Key="UsageColor"/>
+            <conv:FloatFormatConverter x:Key="FloatFmt"/>
+            <conv:MemoryBarWidthConverter x:Key="MemBarWidth"/>
+            <conv:RatioToWidthConverter x:Key="RatioToWidth"/>
+            <conv:DiskHealthStatusToBrushConverter x:Key="DiskHealthBrush"/>
+            <conv:BytesToStringConverter x:Key="BytesToStr"/>
+            <conv:EnumEqualConverter x:Key="EnumEqual"/>
+            <conv:MetricTypeDisplayConverter x:Key="MetricDisplay"/>
+            <conv:CompareDirectionDisplayConverter x:Key="DirectionDisplay"/>
+            <conv:MetricTypeUnitConverter x:Key="MetricUnit"/>
+            <conv:CardIdToDisplayNameConverter x:Key="CardIdDisplay"/>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Border CornerRadius="12" Background="{DynamicResource BgDarkBrush}"
@@ -213,71 +220,6 @@
                                     <Run Text="{Binding MemTotal, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
                                     <Run Text="GB"/>
                                 </TextBlock>
-                            </StackPanel>
-                        </Border>
-                    </Border>
-
-                    <!-- Disk Card -->
-                    <Border x:Name="Card_disk" Tag="disk" Background="Transparent"
-                            Margin="4" AllowDrop="True"
-                            MouseMove="Card_MouseMove" DragEnter="Card_DragEnter"
-                            DragOver="Card_DragOver" Drop="Card_Drop">
-                        <Border Background="{DynamicResource BgCardBrush}" CornerRadius="12"
-                                Padding="12" MinWidth="170" MinHeight="100">
-                            <StackPanel>
-                                <TextBlock Text="磁盘监控" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                                <ItemsControl ItemsSource="{Binding DiskSnapshots}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
-                                                    Padding="4,6" Margin="0,0,0,4">
-                                                <StackPanel>
-                                                    <DockPanel Margin="0,0,0,4">
-                                                        <Ellipse Width="8" Height="8" Margin="0,0,6,0"
-                                                                 Fill="{Binding Health, Converter={StaticResource DiskHealthBrush}}"
-                                                                 VerticalAlignment="Center"/>
-                                                        <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
-                                                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                                                   TextTrimming="CharacterEllipsis"/>
-                                                    </DockPanel>
-                                                    <UniformGrid Columns="3">
-                                                        <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="温度" FontSize="12"
-                                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                                       HorizontalAlignment="Center"/>
-                                                            <TextBlock FontSize="14" HorizontalAlignment="Center"
-                                                                       Foreground="{Binding Temperature, Converter={StaticResource TempColor}}">
-                                                                <Run Text="{Binding Temperature, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
-                                                                <Run Text="°C"/>
-                                                            </TextBlock>
-                                                        </StackPanel>
-                                                        <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="读取" FontSize="12"
-                                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                                       HorizontalAlignment="Center"/>
-                                                            <TextBlock FontSize="14" HorizontalAlignment="Center"
-                                                                       Foreground="{DynamicResource TextPrimaryBrush}">
-                                                                <Run Text="{Binding ReadSpeed, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
-                                                                <Run Text="MB/s"/>
-                                                            </TextBlock>
-                                                        </StackPanel>
-                                                        <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="写入" FontSize="12"
-                                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                                       HorizontalAlignment="Center"/>
-                                                            <TextBlock FontSize="14" HorizontalAlignment="Center"
-                                                                       Foreground="{DynamicResource TextPrimaryBrush}">
-                                                                <Run Text="{Binding WriteSpeed, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
-                                                                <Run Text="MB/s"/>
-                                                            </TextBlock>
-                                                        </StackPanel>
-                                                    </UniformGrid>
-                                                </StackPanel>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
                             </StackPanel>
                         </Border>
                     </Border>
@@ -826,7 +768,7 @@
                                                       Checked="LayoutCard_Toggled"
                                                       Unchecked="LayoutCard_Toggled"
                                                       Margin="0,3" Cursor="Hand">
-                                                <TextBlock Text="{Binding CardId, Converter={StaticResource CardIdDisplay}}"
+                                                <TextBlock Text="{Binding DisplayName}"
                                                            FontSize="13"
                                                            Foreground="{DynamicResource TextPrimaryBrush}"/>
                                             </CheckBox>
