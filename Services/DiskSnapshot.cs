@@ -52,6 +52,16 @@ public class DiskSnapshot
 
     public bool HasLifePercent => LifeUsedPercent.HasValue || LifeRemainingPercent.HasValue;
     public bool HasLifetimeUnavailableReason => !string.IsNullOrWhiteSpace(LifetimeUnavailableReason);
+    public bool HasReliabilityCounters =>
+        PowerOnHours.HasValue ||
+        PowerCycleCount.HasValue ||
+        UnsafeShutdownCount.HasValue ||
+        MediaErrorCount.HasValue ||
+        ErrorLogEntryCount.HasValue;
+    public bool HasTotalIo => TotalReadTb.HasValue || TotalWrittenTb.HasValue;
+    public bool HasPowerCounters => PowerOnHours.HasValue || PowerCycleCount.HasValue;
+    public bool HasShutdownOrCriticalWarning => UnsafeShutdownCount.HasValue || CriticalWarning.HasValue;
+    public bool HasErrorCounters => MediaErrorCount.HasValue || ErrorLogEntryCount.HasValue;
 
     public float LifeRemainingBarPercent =>
         Math.Clamp(LifeRemainingPercent ?? (LifeUsedPercent.HasValue ? 100f - LifeUsedPercent.Value : 0f), 0f, 100f);

@@ -42,8 +42,14 @@ internal sealed class DiskLifetimeInfo
         snapshot.MediaErrorCount ??= MediaErrorCount;
         snapshot.ErrorLogEntryCount ??= ErrorLogEntryCount;
 
-        if (!string.IsNullOrWhiteSpace(ReliabilityUnavailableReason) &&
-            !snapshot.HasLifetimeMetrics)
+        if (string.IsNullOrWhiteSpace(ReliabilityUnavailableReason))
+            return;
+
+        if (!snapshot.HasLifetimeMetrics)
+        {
+            snapshot.LifetimeUnavailableReason = "寿命信息需管理员权限或设备不支持 SMART";
+        }
+        else if (!snapshot.HasReliabilityCounters)
         {
             snapshot.LifetimeUnavailableReason = ReliabilityUnavailableReason;
         }

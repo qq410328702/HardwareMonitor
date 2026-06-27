@@ -130,40 +130,56 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="累计读取" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"/>
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                               Visibility="{Binding HasTotalIo, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TotalReadDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"
+                               Visibility="{Binding HasTotalIo, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="累计写入" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"/>
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                               Visibility="{Binding HasTotalIo, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding TotalWrittenDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"
+                               Visibility="{Binding HasTotalIo, Converter={StaticResource BoolToVis}}"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="通电时间" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"/>
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                               Visibility="{Binding HasPowerCounters, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding PowerOnDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"
+                               Visibility="{Binding HasPowerCounters, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="1" Grid.Column="2" Text="通电次数" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"/>
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                               Visibility="{Binding HasPowerCounters, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding PowerCycleDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"
+                               Visibility="{Binding HasPowerCounters, Converter={StaticResource BoolToVis}}"/>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="不安全关机" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"/>
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                               Visibility="{Binding HasShutdownOrCriticalWarning, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding UnsafeShutdownDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"
+                               Visibility="{Binding HasShutdownOrCriticalWarning, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="2" Grid.Column="2" Text="严重警告" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"/>
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                               Visibility="{Binding HasShutdownOrCriticalWarning, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding CriticalWarningDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"
+                               Visibility="{Binding HasShutdownOrCriticalWarning, Converter={StaticResource BoolToVis}}"/>
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="介质错误" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"/>
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                               Visibility="{Binding HasErrorCounters, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding MediaErrorDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"
+                               Visibility="{Binding HasErrorCounters, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="3" Grid.Column="2" Text="错误日志" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"/>
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                               Visibility="{Binding HasErrorCounters, Converter={StaticResource BoolToVis}}"/>
                     <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding ErrorLogEntryDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"
+                               Visibility="{Binding HasErrorCounters, Converter={StaticResource BoolToVis}}"/>
                 </Grid>
             </StackPanel>
         </Border>

@@ -223,7 +223,7 @@ internal sealed class DiskLifetimeReader
 
     private static void MarkReliabilityUnavailable(Dictionary<string, DiskLifetimeInfo> infos)
     {
-        const string reason = "寿命信息需管理员权限或设备不支持 SMART";
+        const string reason = "通电/错误计数需管理员权限或设备不支持 SMART";
 
         if (infos.Count == 0)
         {
