@@ -133,7 +133,7 @@
                         <TextBlock FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"
                                    HorizontalAlignment="Center">
                             <Run Text="已用 "/>
-                            <Run Text="{Binding LifeUsedDisplay}"/>
+                            <Run Text="{Binding LifeUsedDisplay, Mode=OneWay}"/>
                         </TextBlock>
                     </StackPanel>
 
