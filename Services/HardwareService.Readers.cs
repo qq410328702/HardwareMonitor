@@ -12,15 +12,20 @@ public partial class HardwareService
         snap.CpuName = hw.Name;
 
         float powerPackage = 0, powerCores = 0, powerAny = 0;
+        int cpuTempRank = int.MaxValue;
 
-        foreach (var sensor in hw.Sensors)
+        foreach (var sensor in EnumerateSensors(hw))
         {
             if (sensor.SensorType == SensorType.Temperature)
             {
-                if (sensor.Name.Contains("Package") || sensor.Name.Contains("Tctl") || sensor.Name.Contains("Tdie"))
-                    snap.CpuTemp = sensor.Value ?? 0;
-                else if (snap.CpuTemp == 0)
-                    snap.CpuTemp = sensor.Value ?? 0;
+                float value = sensor.Value ?? 0;
+                int rank = GetCpuTemperatureRank(sensor.Name);
+                if (IsValidTemperature(value) && rank < 100 &&
+                    (rank < cpuTempRank || (rank == cpuTempRank && value > snap.CpuTemp)))
+                {
+                    snap.CpuTemp = value;
+                    cpuTempRank = rank;
+                }
             }
 
             if (sensor.SensorType == SensorType.Load && sensor.Name.Contains("Total"))
@@ -47,6 +52,28 @@ public partial class HardwareService
         snap.CpuPower = powerPackage > 0 ? powerPackage
                        : powerCores > 0 ? powerCores
                        : powerAny;
+    }
+
+    private static void ReadCpuTemperatureFallback(Computer computer, HardwareSnapshot snap)
+    {
+        var candidates = new List<TemperatureCandidate>();
+
+        foreach (var hw in computer.Hardware)
+        {
+            if (hw.HardwareType is not (HardwareType.Cpu or HardwareType.Motherboard))
+                continue;
+
+            UpdateHardwareTree(hw);
+            CollectCpuTemperatureCandidates(hw, candidates);
+        }
+
+        var best = candidates
+            .OrderBy(c => c.Rank)
+            .ThenByDescending(c => c.Value)
+            .FirstOrDefault();
+
+        if (best is not null)
+            snap.CpuTemp = best.Value;
     }
 
     private static void ReadGpu(IHardware hw, HardwareSnapshot snap)
@@ -141,6 +168,59 @@ public partial class HardwareService
         foreach (var child in hw.SubHardware)
             UpdateHardwareTree(child);
     }
+
+    private static IEnumerable<ISensor> EnumerateSensors(IHardware hw)
+    {
+        foreach (var sensor in hw.Sensors)
+            yield return sensor;
+
+        foreach (var child in hw.SubHardware)
+        {
+            foreach (var sensor in EnumerateSensors(child))
+                yield return sensor;
+        }
+    }
+
+    private static void CollectCpuTemperatureCandidates(
+        IHardware hw,
+        List<TemperatureCandidate> candidates)
+    {
+        foreach (var sensor in hw.Sensors)
+        {
+            if (sensor.SensorType != SensorType.Temperature)
+                continue;
+
+            float value = sensor.Value ?? 0;
+            if (!IsValidTemperature(value))
+                continue;
+
+            string sensorName = sensor.Name ?? "";
+            string hardwareName = hw.Name ?? "";
+            int rank = GetCpuTemperatureRank($"{hardwareName} {sensorName}");
+            if (rank >= 100)
+                continue;
+
+            candidates.Add(new TemperatureCandidate(value, rank));
+        }
+
+        foreach (var child in hw.SubHardware)
+            CollectCpuTemperatureCandidates(child, candidates);
+    }
+
+    private static int GetCpuTemperatureRank(string name)
+    {
+        if (Contains(name, "Package")) return 0;
+        if (Contains(name, "Tctl") || Contains(name, "Tdie")) return 1;
+        if (Contains(name, "Core Max") || Contains(name, "Core (Max)")) return 2;
+        if (Contains(name, "CPU")) return 10;
+        if (Contains(name, "PECI")) return 20;
+        if (Contains(name, "ACPI") || Contains(name, "TZ") || Contains(name, "Thermal Zone")) return 30;
+        if (Contains(name, "Core")) return 40;
+        return 100;
+    }
+
+    private static bool IsValidTemperature(float value) =>
+        value > 0f && value < 125f && !float.IsNaN(value) && !float.IsInfinity(value);
 
     private static void CollectPowerSensors(
         IHardware hw,
@@ -403,4 +483,6 @@ public partial class HardwareService
             Watts = watts
         };
     }
+
+    private sealed record TemperatureCandidate(float Value, int Rank);
 }

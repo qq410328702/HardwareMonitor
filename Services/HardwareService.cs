@@ -127,6 +127,10 @@ public partial class HardwareService : IDisposable
 
             if (_computer is not null)
             {
+                if (snap.CpuTemp <= 0)
+                    try { ReadCpuTemperatureFallback(_computer, snap); }
+                    catch (Exception ex) { _logger.Warn($"CPU 温度兜底读取失败: {ex.Message}"); }
+
                 try { ReadPowerSummary(_computer, _cpu, _gpu, _memory, snap); }
                 catch (Exception ex) { _logger.Warn($"功耗读取失败: {ex.Message}"); }
             }
