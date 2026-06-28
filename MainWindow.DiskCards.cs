@@ -4,7 +4,9 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using HardwareMonitor.Services;
 
 namespace HardwareMonitor;
 
@@ -89,6 +91,38 @@ public partial class MainWindow
             Child = content
         };
 
+        card.AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler(DiskCardButton_Click));
+
         return card;
+    }
+
+    private void DiskCardButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (FindAncestorButton(e.OriginalSource as DependencyObject) is not { } button ||
+            button.Name != "BadSectorCheckButton" ||
+            button.Tag is not DiskSnapshot disk)
+        {
+            return;
+        }
+
+        var dialog = new DiskBadSectorDialog(disk)
+        {
+            Owner = this
+        };
+        dialog.ShowDialog();
+        e.Handled = true;
+    }
+
+    private static Button? FindAncestorButton(DependencyObject? source)
+    {
+        while (source is not null)
+        {
+            if (source is Button button)
+                return button;
+
+            source = VisualTreeHelper.GetParent(source);
+        }
+
+        return null;
     }
 }

@@ -7,6 +7,7 @@
     <conv:FloatFormatConverter x:Key="FloatFmt"/>
     <conv:RatioToWidthConverter x:Key="RatioToWidth"/>
     <conv:DiskHealthStatusToBrushConverter x:Key="DiskHealthBrush"/>
+    <conv:DiskBadSectorRiskToBrushConverter x:Key="BadSectorRiskBrush"/>
 
     <Style x:Key="DiskIconPathStyle" TargetType="{x:Type Path}">
         <Setter Property="Width" Value="15"/>
@@ -14,6 +15,49 @@
         <Setter Property="Stretch" Value="Uniform"/>
         <Setter Property="Fill" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+
+    <Style x:Key="DiskActionButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="26"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Root"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="7">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource MiniCardBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.75"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DiskDetailLabelStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="Margin" Value="0,1,8,1"/>
+    </Style>
+
+    <Style x:Key="DiskDetailValueStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="Margin" Value="0,1,14,1"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     </Style>
 
     <DataTemplate x:Key="DiskCardContentTemplate">
@@ -25,30 +69,45 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Path Data="{piw:IconGeometry Icon=hard_drive, IconType=regular}"
                           Style="{StaticResource DiskIconPathStyle}"
                           Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,6,0"
                           VerticalAlignment="Center"/>
-                    <Ellipse Width="8" Height="8" Margin="0,0,6,0"
+                    <Ellipse Grid.Column="1" Width="8" Height="8" Margin="0,0,6,0"
                              Fill="{Binding Health, Converter={StaticResource DiskHealthBrush}}"
-                             Grid.Column="1"
                              VerticalAlignment="Center"/>
                     <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
-                               TextTrimming="CharacterEllipsis"/>
+                               TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                    <Button x:Name="BadSectorCheckButton" Grid.Column="3"
+                            Tag="{Binding}" Style="{StaticResource DiskActionButtonStyle}"
+                            ToolTip="坏道检测" Margin="8,0,0,0">
+                        <Path Data="{piw:IconGeometry Icon=magnifying_glass, IconType=bold}"
+                              Style="{StaticResource DiskIconPathStyle}"
+                              Fill="{DynamicResource TextPrimaryBrush}"
+                              Width="13" Height="13"/>
+                    </Button>
                 </Grid>
+
                 <TextBlock Text="{Binding DiskMetaText}" FontSize="11"
                            Foreground="{DynamicResource TextSecondaryBrush}"
-                           TextTrimming="CharacterEllipsis" Margin="29,0,0,7"/>
+                           TextTrimming="CharacterEllipsis" Margin="29,0,34,8"/>
 
-                <UniformGrid Columns="4" Margin="0,0,0,6">
-                    <StackPanel HorizontalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,1">
                             <Path Data="{piw:IconGeometry Icon=check_circle, IconType=regular}"
                                   Style="{StaticResource DiskIconPathStyle}"
                                   Fill="{Binding Health, Converter={StaticResource DiskHealthBrush}}"
-                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                                  Width="12" Height="12" Margin="0,0,3,0"/>
                             <TextBlock Text="状态" FontSize="12"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        VerticalAlignment="Center"/>
@@ -58,38 +117,32 @@
                                    HorizontalAlignment="Center"
                                    TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
-                    <StackPanel HorizontalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,1">
                             <Path Data="{piw:IconGeometry Icon=battery_high, IconType=regular}"
                                   Style="{StaticResource DiskIconPathStyle}"
-                                  Width="13" Height="13" Margin="0,0,3,0"/>
-                            <TextBlock Text="剩余寿命" FontSize="12"
+                                  Width="12" Height="12" Margin="0,0,3,0"/>
+                            <TextBlock Text="寿命" FontSize="12"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Text="{Binding LifeRemainingDisplay}" FontSize="13"
                                    Foreground="{Binding Health, Converter={StaticResource DiskHealthBrush}}"
                                    HorizontalAlignment="Center"/>
+                        <TextBlock FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center">
+                            <Run Text="已用 "/>
+                            <Run Text="{Binding LifeUsedDisplay}"/>
+                        </TextBlock>
                     </StackPanel>
-                    <StackPanel HorizontalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Path Data="{piw:IconGeometry Icon=chart_pie_slice, IconType=regular}"
-                                  Style="{StaticResource DiskIconPathStyle}"
-                                  Width="13" Height="13" Margin="0,0,3,0"/>
-                            <TextBlock Text="已用寿命" FontSize="12"
-                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding LifeUsedDisplay}" FontSize="13"
-                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,1">
                             <Path Data="{piw:IconGeometry Icon=thermometer, IconType=regular}"
                                   Style="{StaticResource DiskIconPathStyle}"
                                   Fill="{Binding Temperature, Converter={StaticResource TempColor}}"
-                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                                  Width="12" Height="12" Margin="0,0,3,0"/>
                             <TextBlock Text="温度" FontSize="12"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        VerticalAlignment="Center"/>
@@ -100,7 +153,7 @@
                             <Run Text="°C"/>
                         </TextBlock>
                     </StackPanel>
-                </UniformGrid>
+                </Grid>
 
                 <Grid Height="6" Margin="0,0,0,8"
                       Visibility="{Binding HasLifePercent, Converter={StaticResource BoolToVis}}">
@@ -116,13 +169,13 @@
                     </Border>
                 </Grid>
 
-                <UniformGrid Columns="3" Margin="0,0,0,8">
+                <UniformGrid Columns="3" Margin="0,0,0,7">
                     <StackPanel HorizontalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Path Data="{piw:IconGeometry Icon=arrow_down, IconType=regular}"
                                   Style="{StaticResource DiskIconPathStyle}"
                                   Fill="{DynamicResource AccentBlueBrush}"
-                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                                  Width="12" Height="12" Margin="0,0,3,0"/>
                             <TextBlock Text="读取" FontSize="12"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        VerticalAlignment="Center"/>
@@ -138,7 +191,7 @@
                             <Path Data="{piw:IconGeometry Icon=arrow_up, IconType=regular}"
                                   Style="{StaticResource DiskIconPathStyle}"
                                   Fill="{DynamicResource AccentOrangeBrush}"
-                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                                  Width="12" Height="12" Margin="0,0,3,0"/>
                             <TextBlock Text="写入" FontSize="12"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        VerticalAlignment="Center"/>
@@ -153,7 +206,7 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Path Data="{piw:IconGeometry Icon=battery_charging, IconType=regular}"
                                   Style="{StaticResource DiskIconPathStyle}"
-                                  Width="13" Height="13" Margin="0,0,3,0"/>
+                                  Width="12" Height="12" Margin="0,0,3,0"/>
                             <TextBlock Text="备用空间" FontSize="12"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        VerticalAlignment="Center"/>
@@ -169,7 +222,45 @@
                            TextWrapping="Wrap" Margin="0,0,0,6"
                            Visibility="{Binding HasLifetimeUnavailableReason, Converter={StaticResource BoolToVis}}"/>
 
-                <Grid Margin="0,2,0,0">
+                <Border Background="#0C888888" BorderBrush="#18888888" BorderThickness="1"
+                        CornerRadius="8" Padding="7,5" Margin="0,0,0,8"
+                        ToolTip="{Binding BadSectorUnavailableReason}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Path Data="{piw:IconGeometry Icon=warning_circle, IconType=regular}"
+                              Style="{StaticResource DiskIconPathStyle}"
+                              Fill="{Binding BadSectorRisk, Converter={StaticResource BadSectorRiskBrush}}"
+                              Width="13" Height="13" Margin="0,0,5,0"
+                              VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="坏道" FontSize="12"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Grid.Column="2" Text="{Binding BadSectorStatusText}" FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{Binding BadSectorRisk, Converter={StaticResource BadSectorRiskBrush}}"
+                                   VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <Grid Grid.Column="3" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding BadSectorRiskReason}" FontSize="10"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Visibility="{Binding HasBadSectorRiskReason, Converter={StaticResource BoolToVis}}"/>
+                            <TextBlock Text="SMART 坏道字段不可读" FontSize="10"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Visibility="{Binding HasBadSectorUnavailableReason, Converter={StaticResource BoolToVis}}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Border Height="1" Background="{DynamicResource BorderBrush}" Opacity="0.45" Margin="0,0,0,5"/>
+
+                <Grid Margin="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -183,56 +274,60 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="累计读取" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="累计读取"
+                               Style="{StaticResource DiskDetailLabelStyle}"
                                Visibility="{Binding HasTotalIo, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TotalReadDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TotalReadDisplay}"
+                               Style="{StaticResource DiskDetailValueStyle}"
                                Visibility="{Binding HasTotalIo, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="累计写入" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="累计写入"
+                               Style="{StaticResource DiskDetailLabelStyle}"
                                Visibility="{Binding HasTotalIo, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding TotalWrittenDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding TotalWrittenDisplay}"
+                               Style="{StaticResource DiskDetailValueStyle}"
+                               Margin="0,1,0,1"
                                Visibility="{Binding HasTotalIo, Converter={StaticResource BoolToVis}}"/>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="通电时间" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="通电时间"
+                               Style="{StaticResource DiskDetailLabelStyle}"
                                Visibility="{Binding HasPowerCounters, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding PowerOnDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding PowerOnDisplay}"
+                               Style="{StaticResource DiskDetailValueStyle}"
                                Visibility="{Binding HasPowerCounters, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="2" Text="通电次数" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="通电次数"
+                               Style="{StaticResource DiskDetailLabelStyle}"
                                Visibility="{Binding HasPowerCounters, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding PowerCycleDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"
+                    <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding PowerCycleDisplay}"
+                               Style="{StaticResource DiskDetailValueStyle}"
+                               Margin="0,1,0,1"
                                Visibility="{Binding HasPowerCounters, Converter={StaticResource BoolToVis}}"/>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="不安全关机" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="不安全关机"
+                               Style="{StaticResource DiskDetailLabelStyle}"
                                Visibility="{Binding HasShutdownOrCriticalWarning, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding UnsafeShutdownDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding UnsafeShutdownDisplay}"
+                               Style="{StaticResource DiskDetailValueStyle}"
                                Visibility="{Binding HasShutdownOrCriticalWarning, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="2" Text="严重警告" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                    <TextBlock Grid.Row="2" Grid.Column="2" Text="严重警告"
+                               Style="{StaticResource DiskDetailLabelStyle}"
                                Visibility="{Binding HasShutdownOrCriticalWarning, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding CriticalWarningDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"
+                    <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding CriticalWarningDisplay}"
+                               Style="{StaticResource DiskDetailValueStyle}"
+                               Margin="0,1,0,1"
                                Visibility="{Binding HasShutdownOrCriticalWarning, Converter={StaticResource BoolToVis}}"/>
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="介质错误" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="介质错误"
+                               Style="{StaticResource DiskDetailLabelStyle}"
                                Visibility="{Binding HasErrorCounters, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding MediaErrorDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,14,1"
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding MediaErrorDisplay}"
+                               Style="{StaticResource DiskDetailValueStyle}"
                                Visibility="{Binding HasErrorCounters, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="2" Text="错误日志" FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,1,8,1"
+                    <TextBlock Grid.Row="3" Grid.Column="2" Text="错误日志"
+                               Style="{StaticResource DiskDetailLabelStyle}"
                                Visibility="{Binding HasErrorCounters, Converter={StaticResource BoolToVis}}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding ErrorLogEntryDisplay}" FontSize="11"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,1,0,1"
+                    <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding ErrorLogEntryDisplay}"
+                               Style="{StaticResource DiskDetailValueStyle}"
+                               Margin="0,1,0,1"
                                Visibility="{Binding HasErrorCounters, Converter={StaticResource BoolToVis}}"/>
                 </Grid>
             </StackPanel>

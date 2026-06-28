@@ -83,6 +83,22 @@ internal static class DiskSensorParser
         {
             snapshot.UnsafeShutdownCount ??= ToLong(value);
         }
+        else if (IsReallocatedSectorSensor(name))
+        {
+            snapshot.ReallocatedSectorCount ??= ToLong(value);
+        }
+        else if (IsCurrentPendingSectorSensor(name))
+        {
+            snapshot.CurrentPendingSectorCount ??= ToLong(value);
+        }
+        else if (IsOfflineUncorrectableSectorSensor(name))
+        {
+            snapshot.OfflineUncorrectableSectorCount ??= ToLong(value);
+        }
+        else if (IsUncorrectableErrorSensor(name))
+        {
+            snapshot.UncorrectableErrorCount ??= ToLong(value);
+        }
         else if (Contains(name, "Media Errors") || Contains(name, "Media and Data Integrity"))
         {
             snapshot.MediaErrorCount ??= ToLong(value);
@@ -118,6 +134,25 @@ internal static class DiskSensorParser
         Contains(name, "Total LBAs Written") ||
         Contains(name, "Sectors Written") ||
         Contains(name, "Host Writes");
+
+    private static bool IsReallocatedSectorSensor(string name) =>
+        Contains(name, "Reallocated") &&
+        (Contains(name, "Sector") || Contains(name, "Event"));
+
+    private static bool IsCurrentPendingSectorSensor(string name) =>
+        Contains(name, "Current Pending Sector") ||
+        Contains(name, "Pending Sector Count") ||
+        Contains(name, "Pending Sectors");
+
+    private static bool IsOfflineUncorrectableSectorSensor(string name) =>
+        Contains(name, "Offline Uncorrectable") ||
+        Contains(name, "Uncorrectable Sector") ||
+        Contains(name, "Uncorrectable Sectors");
+
+    private static bool IsUncorrectableErrorSensor(string name) =>
+        Contains(name, "Reported Uncorrectable") ||
+        Contains(name, "Uncorrectable Error") ||
+        Contains(name, "Uncorrectable Errors");
 
     private static double ConvertDataSensorToTb(ISensor sensor, float value)
     {

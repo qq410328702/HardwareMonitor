@@ -7,6 +7,8 @@ namespace HardwareMonitor.Services;
 
 public enum DiskHealthStatus { Healthy, Warning, Critical }
 
+public enum DiskBadSectorRiskStatus { Unknown, Healthy, Warning, Critical }
+
 public class DiskSnapshot : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -30,6 +32,12 @@ public class DiskSnapshot : INotifyPropertyChanged
     public long? UnsafeShutdownCount { get; set; }
     public long? MediaErrorCount { get; set; }
     public long? ErrorLogEntryCount { get; set; }
+    public long? ReallocatedSectorCount { get; set; }
+    public long? CurrentPendingSectorCount { get; set; }
+    public long? OfflineUncorrectableSectorCount { get; set; }
+    public long? UncorrectableReadErrorCount { get; set; }
+    public long? UncorrectableWriteErrorCount { get; set; }
+    public long? UncorrectableErrorCount { get; set; }
     public long? WarningTemperatureMinutes { get; set; }
     public long? CriticalTemperatureMinutes { get; set; }
     public string DriveLetters { get; set; } = "";
@@ -37,6 +45,11 @@ public class DiskSnapshot : INotifyPropertyChanged
     public string MediaType { get; set; } = "";
     public string LifetimeStatusText { get; set; } = "";
     public string LifetimeUnavailableReason { get; set; } = "";
+    public DiskBadSectorRiskStatus BadSectorRisk { get; set; } = DiskBadSectorRiskStatus.Unknown;
+    public string BadSectorStatusText { get; set; } = "未知";
+    public string BadSectorRiskReason { get; set; } = "";
+    public string BadSectorUnavailableReason { get; set; } = "";
+    public DateTime? BadSectorLastCheckedAt { get; set; }
 
     public bool HasLifetimeMetrics =>
         LifeUsedPercent.HasValue ||
@@ -50,6 +63,12 @@ public class DiskSnapshot : INotifyPropertyChanged
         UnsafeShutdownCount.HasValue ||
         MediaErrorCount.HasValue ||
         ErrorLogEntryCount.HasValue ||
+        ReallocatedSectorCount.HasValue ||
+        CurrentPendingSectorCount.HasValue ||
+        OfflineUncorrectableSectorCount.HasValue ||
+        UncorrectableReadErrorCount.HasValue ||
+        UncorrectableWriteErrorCount.HasValue ||
+        UncorrectableErrorCount.HasValue ||
         WarningTemperatureMinutes.HasValue ||
         CriticalTemperatureMinutes.HasValue;
 
@@ -65,6 +84,18 @@ public class DiskSnapshot : INotifyPropertyChanged
     public bool HasPowerCounters => PowerOnHours.HasValue || PowerCycleCount.HasValue;
     public bool HasShutdownOrCriticalWarning => UnsafeShutdownCount.HasValue || CriticalWarning.HasValue;
     public bool HasErrorCounters => MediaErrorCount.HasValue || ErrorLogEntryCount.HasValue;
+    public bool HasBadSectorMetrics =>
+        ReallocatedSectorCount.HasValue ||
+        CurrentPendingSectorCount.HasValue ||
+        OfflineUncorrectableSectorCount.HasValue ||
+        UncorrectableReadErrorCount.HasValue ||
+        UncorrectableWriteErrorCount.HasValue ||
+        UncorrectableErrorCount.HasValue ||
+        MediaErrorCount.HasValue ||
+        ErrorLogEntryCount.HasValue;
+    public bool HasBadSectorUnavailableReason => !string.IsNullOrWhiteSpace(BadSectorUnavailableReason);
+    public bool HasBadSectorRiskReason => !string.IsNullOrWhiteSpace(BadSectorRiskReason);
+    public bool HasDriveLetters => !string.IsNullOrWhiteSpace(DriveLetters);
 
     public float LifeRemainingBarPercent =>
         Math.Clamp(LifeRemainingPercent ?? (LifeUsedPercent.HasValue ? 100f - LifeUsedPercent.Value : 0f), 0f, 100f);
@@ -82,10 +113,19 @@ public class DiskSnapshot : INotifyPropertyChanged
     public string UnsafeShutdownDisplay => FormatCount(UnsafeShutdownCount);
     public string MediaErrorDisplay => FormatCount(MediaErrorCount);
     public string ErrorLogEntryDisplay => FormatCount(ErrorLogEntryCount);
+    public string ReallocatedSectorDisplay => FormatCount(ReallocatedSectorCount);
+    public string CurrentPendingSectorDisplay => FormatCount(CurrentPendingSectorCount);
+    public string OfflineUncorrectableSectorDisplay => FormatCount(OfflineUncorrectableSectorCount);
+    public string UncorrectableReadErrorDisplay => FormatCount(UncorrectableReadErrorCount);
+    public string UncorrectableWriteErrorDisplay => FormatCount(UncorrectableWriteErrorCount);
+    public string UncorrectableErrorDisplay => FormatCount(UncorrectableErrorCount);
     public string CriticalWarningDisplay => CriticalWarning.HasValue ? $"0x{CriticalWarning.Value:X2}" : "--";
     public string WarningTemperatureTimeDisplay => FormatMinutes(WarningTemperatureMinutes);
     public string CriticalTemperatureTimeDisplay => FormatMinutes(CriticalTemperatureMinutes);
     public string LayoutDisplayName => string.IsNullOrWhiteSpace(Name) ? "磁盘" : $"磁盘 - {Name}";
+    public string BadSectorLastCheckedDisplay => BadSectorLastCheckedAt.HasValue
+        ? BadSectorLastCheckedAt.Value.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture)
+        : "--";
 
     private static string FormatPercent(float? value) => value.HasValue ? $"{value.Value:F0}%" : "--";
     private static string FormatTb(double? value) => value.HasValue ? $"{value.Value:F1} TB" : "--";
@@ -111,6 +151,12 @@ public class DiskSnapshot : INotifyPropertyChanged
         UnsafeShutdownCount = source.UnsafeShutdownCount;
         MediaErrorCount = source.MediaErrorCount;
         ErrorLogEntryCount = source.ErrorLogEntryCount;
+        ReallocatedSectorCount = source.ReallocatedSectorCount;
+        CurrentPendingSectorCount = source.CurrentPendingSectorCount;
+        OfflineUncorrectableSectorCount = source.OfflineUncorrectableSectorCount;
+        UncorrectableReadErrorCount = source.UncorrectableReadErrorCount;
+        UncorrectableWriteErrorCount = source.UncorrectableWriteErrorCount;
+        UncorrectableErrorCount = source.UncorrectableErrorCount;
         WarningTemperatureMinutes = source.WarningTemperatureMinutes;
         CriticalTemperatureMinutes = source.CriticalTemperatureMinutes;
         DriveLetters = source.DriveLetters;
@@ -118,6 +164,11 @@ public class DiskSnapshot : INotifyPropertyChanged
         MediaType = source.MediaType;
         LifetimeStatusText = source.LifetimeStatusText;
         LifetimeUnavailableReason = source.LifetimeUnavailableReason;
+        BadSectorRisk = source.BadSectorRisk;
+        BadSectorStatusText = source.BadSectorStatusText;
+        BadSectorRiskReason = source.BadSectorRiskReason;
+        BadSectorUnavailableReason = source.BadSectorUnavailableReason;
+        BadSectorLastCheckedAt = source.BadSectorLastCheckedAt;
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
     }

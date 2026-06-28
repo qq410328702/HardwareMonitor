@@ -18,6 +18,12 @@ internal sealed class DiskLifetimeInfo
     public long? PowerCycleCount { get; set; }
     public long? MediaErrorCount { get; set; }
     public long? ErrorLogEntryCount { get; set; }
+    public long? ReallocatedSectorCount { get; set; }
+    public long? CurrentPendingSectorCount { get; set; }
+    public long? OfflineUncorrectableSectorCount { get; set; }
+    public long? UncorrectableReadErrorCount { get; set; }
+    public long? UncorrectableWriteErrorCount { get; set; }
+    public long? UncorrectableErrorCount { get; set; }
 
     public string NormalizedName => DiskLifetimeReader.Normalize(FriendlyName);
 
@@ -41,6 +47,12 @@ internal sealed class DiskLifetimeInfo
         snapshot.PowerCycleCount ??= PowerCycleCount;
         snapshot.MediaErrorCount ??= MediaErrorCount;
         snapshot.ErrorLogEntryCount ??= ErrorLogEntryCount;
+        snapshot.ReallocatedSectorCount ??= ReallocatedSectorCount;
+        snapshot.CurrentPendingSectorCount ??= CurrentPendingSectorCount;
+        snapshot.OfflineUncorrectableSectorCount ??= OfflineUncorrectableSectorCount;
+        snapshot.UncorrectableReadErrorCount ??= UncorrectableReadErrorCount;
+        snapshot.UncorrectableWriteErrorCount ??= UncorrectableWriteErrorCount;
+        snapshot.UncorrectableErrorCount ??= UncorrectableErrorCount;
 
         if (string.IsNullOrWhiteSpace(ReliabilityUnavailableReason))
             return;

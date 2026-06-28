@@ -25,3 +25,24 @@ public class DiskHealthStatusToBrushConverter : IValueConverter
 
     public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotImplementedException();
 }
+
+public class DiskBadSectorRiskToBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type t, object p, CultureInfo c)
+    {
+        if (value is DiskBadSectorRiskStatus status)
+        {
+            return status switch
+            {
+                DiskBadSectorRiskStatus.Healthy => new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50)),
+                DiskBadSectorRiskStatus.Warning => new SolidColorBrush(Color.FromRgb(0xD2, 0x99, 0x22)),
+                DiskBadSectorRiskStatus.Critical => new SolidColorBrush(Color.FromRgb(0xF8, 0x51, 0x49)),
+                _ => new SolidColorBrush(Color.FromRgb(0x8B, 0x94, 0x9E))
+            };
+        }
+
+        return new SolidColorBrush(Color.FromRgb(0x8B, 0x94, 0x9E));
+    }
+
+    public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotImplementedException();
+}

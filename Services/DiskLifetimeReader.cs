@@ -161,6 +161,8 @@ internal sealed class DiskLifetimeReader
                 long? readErrors = ReadLong(counter, "ReadErrorsTotal");
                 long? writeErrors = ReadLong(counter, "WriteErrorsTotal");
 
+                info.UncorrectableReadErrorCount ??= uncorrectedRead;
+                info.UncorrectableWriteErrorCount ??= uncorrectedWrite;
                 info.MediaErrorCount ??= SumNonNull(uncorrectedRead, uncorrectedWrite);
                 info.ErrorLogEntryCount ??= SumNonNull(readErrors, writeErrors);
             }
