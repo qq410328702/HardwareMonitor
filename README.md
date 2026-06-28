@@ -2,7 +2,7 @@
 
 一个轻量的 Windows 硬件监控工具，基于 WPF 和 LibreHardwareMonitor 构建。当前版本专注于核心硬件状态、真实传感器功耗统计、磁盘 SMART/寿命信息、悬浮窗和系统托盘。
 
-当前正式版：**v1.0.7**
+当前正式版：**v1.0.8**
 
 [下载最新版](https://github.com/qq410328702/HardwareMonitor/releases/latest)
 
@@ -41,7 +41,8 @@
 - 主窗口按类型分组展示：硬件概览、功耗统计、存储设备
 - 主窗口和悬浮窗使用 Phosphor 风格线性矢量图标
 - 悬浮窗模式：置顶展示核心数据，支持拖拽移动
-- 系统托盘：显示/隐藏主窗口、打开悬浮窗、开机自启、退出
+- 系统托盘：显示/隐藏主窗口、打开悬浮窗、检查更新、开机自启、退出
+- 版本更新：基于 GitHub Releases 检查新版本，支持自动下载、校验并安装
 - 自带应用图标，已应用到 exe、主窗口、悬浮窗和托盘
 - 普通权限可运行；部分温度、功耗和 SMART 可靠性计数可能需要管理员权限
 
@@ -56,7 +57,7 @@
 
 当前发布包：
 
-- `HardwareMonitor-v1.0.7-win-x64.zip`
+- `HardwareMonitor-v1.0.8-win-x64.zip`
 
 解压后运行 `HardwareMonitor.exe` 即可。发布包为 Windows x64 自包含版本，无需额外安装 .NET 运行时。
 
@@ -67,6 +68,7 @@
 | .NET 8 WPF | 桌面 UI 框架 |
 | LibreHardwareMonitor | CPU / GPU / 内存 / 磁盘 / 功耗传感器读取 |
 | PhosphorIconsWpf | Phosphor 风格 WPF 矢量图标 |
+| GitHub Releases | 版本更新检查与发布包下载 |
 | Windows Forms NotifyIcon | 系统托盘 |
 | MVVM + partial 拆分 | 窗口和 ViewModel 按功能组织 |
 
@@ -118,7 +120,8 @@ dotnet publish .\HardwareMonitor.csproj -c Release -r win-x64 -o .\publish
 - 悬浮窗：拖拽移动，右键关闭，点击 `□` 展开主窗口
 - 主窗口：标题栏拖拽移动，点击 `🔽` 切换悬浮窗
 - 主题：通过标题栏下拉框切换
-- 托盘菜单：显示主窗口、显示迷你窗口、开机自启、退出
+- 托盘菜单：显示主窗口、显示迷你窗口、检查更新、开机自启、退出
+- 更新：启动后会自动检查一次，也可通过主窗口标题栏或托盘菜单手动检查
 - 电费统计只累计应用运行期间检测到的功耗，配置和累计数据保存在 `%LOCALAPPDATA%\HardwareMonitor\electricity.json`
 - 管理员运行可读取更多硬件传感器和 SMART 可靠性字段
 

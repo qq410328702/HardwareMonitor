@@ -39,6 +39,43 @@
                 <Setter Property="Height" Value="13"/>
             </Style>
 
+            <Style x:Key="UpdatePillButtonStyle" TargetType="{x:Type Button}">
+                <Setter Property="Width" Value="42"/>
+                <Setter Property="Height" Value="22"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#4F92F8"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="PillRoot"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="11"
+                                    SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  RecognizesAccessKey="True"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="PillRoot" Property="Background" Value="#68A4FF"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="PillRoot" Property="Background" Value="#3479DF"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="PillRoot" Property="Opacity" Value="0.55"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <Style x:Key="ElectricityTextBoxStyle" TargetType="{x:Type TextBox}">
                 <Setter Property="Background" Value="{DynamicResource MiniCardBrush}"/>
                 <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
@@ -84,6 +121,10 @@
                                FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,8,0">
+                    <Button Content="更新" Click="CheckUpdates_Click"
+                            Style="{StaticResource UpdatePillButtonStyle}"
+                            ToolTip="检查更新"
+                            Margin="0,0,8,0"/>
                     <ComboBox x:Name="ThemeCombo"
                               ItemsSource="{Binding ThemeNames}"
                               SelectedIndex="{Binding ThemeIndex}"

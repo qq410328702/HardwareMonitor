@@ -2,6 +2,7 @@ using HardwareMonitor.Services;
 using HardwareMonitor.ViewModels;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace HardwareMonitor
@@ -13,9 +14,16 @@ namespace HardwareMonitor
         private MiniWindow? _miniWindow;
         private FileLogger? _logger;
         private ITrayService? _trayService;
+        private UpdateService? _updateService;
 
         private void App_Startup(object sender, StartupEventArgs e)
         {
+            if (UpdateService.TryApplyUpdateFromArgs(e.Args))
+            {
+                Shutdown();
+                return;
+            }
+
             // Apply light theme as default
             ThemeService.Apply(1);
 
@@ -25,6 +33,7 @@ namespace HardwareMonitor
                 "HardwareMonitor", "logs");
             _logger = new FileLogger(logDir);
             var hwService = new HardwareService(_logger);
+            _updateService = new UpdateService(_logger);
 
             // Create new monitoring services
             var diskService = new DiskMonitorService(hwService, _logger);
@@ -39,15 +48,17 @@ namespace HardwareMonitor
             _vm = new MainViewModel(hwService, diskService, electricityCostService);
 
             // Create main window but keep it hidden
-            _mainWindow = new MainWindow(_vm);
+            _mainWindow = new MainWindow(_vm, _updateService);
 
             // Bind tray service events
             _trayService.ShowMainRequested += (_, _) => Dispatcher.Invoke(ShowMain);
             _trayService.ShowMiniRequested += (_, _) => Dispatcher.Invoke(ShowMini);
+            _trayService.CheckUpdateRequested += (_, _) => Dispatcher.Invoke(CheckUpdatesFromTray);
             _trayService.ExitRequested += (_, _) => Dispatcher.Invoke(ExitApplication);
 
             // Show mini window directly
             ShowMini();
+            _ = CheckForUpdatesOnStartupAsync();
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -106,6 +117,40 @@ namespace HardwareMonitor
         {
             _trayService?.Dispose();
             Shutdown();
+        }
+
+        private void CheckUpdatesFromTray()
+        {
+            ShowMain();
+            _mainWindow?.BeginManualUpdateCheck();
+        }
+
+        private async Task CheckForUpdatesOnStartupAsync()
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                if (_updateService is null)
+                    return;
+
+                var info = await _updateService.CheckForUpdatesAsync();
+                if (!info.IsNewer)
+                    return;
+
+                Dispatcher.Invoke(() =>
+                {
+                    var dialog = new UpdateDialog(_updateService, info, false);
+                    if (_mainWindow?.IsVisible == true)
+                        dialog.Owner = _mainWindow;
+                    else if (_miniWindow?.IsVisible == true)
+                        dialog.Owner = _miniWindow;
+                    dialog.ShowDialog();
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger?.Warn($"Startup update check failed: {ex.Message}");
+            }
         }
     }
 }

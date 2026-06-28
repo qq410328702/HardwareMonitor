@@ -30,6 +30,7 @@ public interface ITrayService : IDisposable
     void ShowBalloonTip(string title, string text, ToolTipIcon icon = ToolTipIcon.Warning);
     event EventHandler? ShowMainRequested;
     event EventHandler? ShowMiniRequested;
+    event EventHandler? CheckUpdateRequested;
     event EventHandler? ExitRequested;
 }
 
@@ -46,6 +47,7 @@ public class TrayService : ITrayService
 
     public event EventHandler? ShowMainRequested;
     public event EventHandler? ShowMiniRequested;
+    public event EventHandler? CheckUpdateRequested;
     public event EventHandler? ExitRequested;
 
     public TrayService(ILogger? logger = null)
@@ -183,6 +185,10 @@ public class TrayService : ITrayService
         showMiniItem.Click += (_, _) =>
             ShowMiniRequested?.Invoke(this, EventArgs.Empty);
 
+        var checkUpdateItem = new ToolStripMenuItem("检查更新");
+        checkUpdateItem.Click += (_, _) =>
+            CheckUpdateRequested?.Invoke(this, EventArgs.Empty);
+
         _autoStartItem = new ToolStripMenuItem("开机自启")
         {
             CheckOnClick = true,
@@ -204,6 +210,7 @@ public class TrayService : ITrayService
 
         menu.Items.Add(showMainItem);
         menu.Items.Add(showMiniItem);
+        menu.Items.Add(checkUpdateItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(_autoStartItem);
         menu.Items.Add(new ToolStripSeparator());
