@@ -2,7 +2,7 @@
 
 一个轻量的 Windows 硬件监控工具，基于 WPF 和 LibreHardwareMonitor 构建。当前版本专注于核心硬件状态、真实传感器功耗统计、磁盘 SMART/寿命信息、悬浮窗和系统托盘。
 
-当前正式版：**v1.0.6**
+当前正式版：**v1.0.7**
 
 [下载最新版](https://github.com/qq410328702/HardwareMonitor/releases/latest)
 
@@ -56,7 +56,7 @@
 
 当前发布包：
 
-- `HardwareMonitor-v1.0.6-win-x64.zip`
+- `HardwareMonitor-v1.0.7-win-x64.zip`
 
 解压后运行 `HardwareMonitor.exe` 即可。发布包为 Windows x64 自包含版本，无需额外安装 .NET 运行时。
 
