@@ -2,7 +2,7 @@
 
 一个轻量的 Windows 硬件监控工具，基于 WPF 和 LibreHardwareMonitor 构建。当前版本专注于核心硬件状态、真实传感器功耗统计、磁盘 SMART/寿命信息、悬浮窗和系统托盘。
 
-当前正式版：**v1.0.9**
+当前正式版：**v1.0.10**
 
 [下载最新版](https://github.com/qq410328702/HardwareMonitor/releases/latest)
 
@@ -38,6 +38,8 @@
   - SMART 坏道风险摘要：重映射扇区、待映射扇区、离线不可纠正、不可纠正读写错误
   - 每块硬盘可打开坏道检测窗口，查看 SMART 计数明细
   - 支持按盘符快速扫描和完整扫描，只读读取，不执行修复或写入
+- 存储设备按类型分组：NVMe、SATA SSD、HDD、其它设备
+- 磁盘温度规则按类型区分：NVMe 60/70°C，SATA SSD 50/60°C，HDD 42/52°C
 - SMART 不可读时会显示清晰降级提示，不影响其它监控数据
 
 ### 使用体验
@@ -61,7 +63,7 @@
 
 当前发布包：
 
-- `HardwareMonitor-v1.0.9-win-x64.zip`
+- `HardwareMonitor-v1.0.10-win-x64.zip`
 
 解压后运行 `HardwareMonitor.exe` 即可。发布包为 Windows x64 自包含版本，无需额外安装 .NET 运行时。
 
