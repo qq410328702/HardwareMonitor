@@ -68,8 +68,8 @@ public class DiskMonitorService : IDiskMonitorService
 
     /// <summary>
     /// Maps disk temperature to a health status.
-    /// Pure static function for easy property testing.
-    /// &gt; 60°C = Critical, &gt; 50°C = Warning, &lt;= 50°C = Healthy
+    /// Pure static fallback for easy property testing.
+    /// Unknown disk types use the SATA SSD rule: &gt;= 60°C = Critical, &gt;= 50°C = Warning.
     /// </summary>
     public static DiskHealthStatus MapHealthStatus(float temperature) =>
         DiskHealthMapper.MapTemperature(temperature);

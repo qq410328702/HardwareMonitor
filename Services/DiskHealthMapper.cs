@@ -34,19 +34,17 @@ internal static class DiskHealthMapper
 
     public static DiskHealthStatus MapTemperature(float temperature)
     {
-        if (temperature > 60f)
-            return DiskHealthStatus.Critical;
-        if (temperature > 50f)
-            return DiskHealthStatus.Warning;
-        return DiskHealthStatus.Healthy;
+        return DiskTemperaturePolicy.MapTemperature(temperature);
     }
 
     private static DiskHealthStatus MapSmartHealthStatus(DiskSnapshot snapshot)
     {
+        DiskHealthStatus temperatureHealth = DiskTemperaturePolicy.MapTemperature(snapshot);
+
         if (snapshot.CriticalWarning.GetValueOrDefault() != 0 ||
             snapshot.BadSectorRisk == DiskBadSectorRiskStatus.Critical ||
             snapshot.MediaErrorCount.GetValueOrDefault() > 0 ||
-            snapshot.Temperature > 60f ||
+            temperatureHealth == DiskHealthStatus.Critical ||
             IsUnhealthy(snapshot.LifetimeStatusText))
         {
             return DiskHealthStatus.Critical;
@@ -60,7 +58,7 @@ internal static class DiskHealthMapper
             snapshot.LifeRemainingPercent.GetValueOrDefault(100f) <= 20f ||
             spareBelowThreshold ||
             snapshot.BadSectorRisk == DiskBadSectorRiskStatus.Warning ||
-            snapshot.Temperature > 50f ||
+            temperatureHealth == DiskHealthStatus.Warning ||
             IsWarning(snapshot.LifetimeStatusText))
         {
             return DiskHealthStatus.Warning;

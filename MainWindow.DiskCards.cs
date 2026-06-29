@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,7 +18,25 @@ public partial class MainWindow
 
     private void DiskSnapshots_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        if (e.OldItems is not null)
+        {
+            foreach (DiskSnapshot disk in e.OldItems.OfType<DiskSnapshot>())
+                disk.PropertyChanged -= DiskSnapshot_PropertyChanged;
+        }
+
+        if (e.NewItems is not null)
+        {
+            foreach (DiskSnapshot disk in e.NewItems.OfType<DiskSnapshot>())
+                disk.PropertyChanged += DiskSnapshot_PropertyChanged;
+        }
+
         QueueDiskCardRefresh();
+    }
+
+    private void DiskSnapshot_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DiskSnapshot.StorageGroupKey))
+            QueueDiskCardRefresh();
     }
 
     private void QueueDiskCardRefresh()
@@ -47,13 +66,16 @@ public partial class MainWindow
             .Select(g => g.First())
             .ToList();
 
-        if (disks.Count == 0 && _dynamicDiskCards.Count == 0)
-            return;
-
         var currentIds = disks.Select(d => d.LayoutCardId).ToHashSet();
+        if (disks.Count == 0 && _dynamicDiskCards.Count == 0)
+        {
+            RefreshStorageGroupVisibility();
+            return;
+        }
+
         foreach (var removedId in _dynamicDiskCards.Keys.Where(id => !currentIds.Contains(id)).ToList())
         {
-            StorageCardPanel.Children.Remove(_dynamicDiskCards[removedId]);
+            RemoveDiskCardFromParent(_dynamicDiskCards[removedId]);
             _dynamicDiskCards.Remove(removedId);
         }
 
@@ -71,9 +93,15 @@ public partial class MainWindow
             if (card.Child is ContentControl content)
                 content.Content = disk;
 
-            if (!StorageCardPanel.Children.Contains(card))
-                StorageCardPanel.Children.Add(card);
+            var targetPanel = GetStorageCardPanel(disk.StorageGroupKey);
+            if (!targetPanel.Children.Contains(card))
+            {
+                RemoveDiskCardFromParent(card);
+                targetPanel.Children.Add(card);
+            }
         }
+
+        RefreshStorageGroupVisibility();
     }
 
     private Border CreateDiskCard(string cardId)
@@ -94,6 +122,29 @@ public partial class MainWindow
         card.AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler(DiskCardButton_Click));
 
         return card;
+    }
+
+    private WrapPanel GetStorageCardPanel(string groupKey) => groupKey switch
+    {
+        DiskTemperaturePolicy.NvmeGroupKey => NvmeStorageCardPanel,
+        DiskTemperaturePolicy.SataSsdGroupKey => SataSsdStorageCardPanel,
+        DiskTemperaturePolicy.HddGroupKey => HddStorageCardPanel,
+        _ => OtherStorageCardPanel
+    };
+
+    private static void RemoveDiskCardFromParent(Border card)
+    {
+        if (card.Parent is Panel panel)
+            panel.Children.Remove(card);
+    }
+
+    private void RefreshStorageGroupVisibility()
+    {
+        NvmeStorageGroup.Visibility = NvmeStorageCardPanel.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        SataSsdStorageGroup.Visibility = SataSsdStorageCardPanel.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        HddStorageGroup.Visibility = HddStorageCardPanel.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        OtherStorageGroup.Visibility = OtherStorageCardPanel.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        StorageGroup.Visibility = _dynamicDiskCards.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void DiskCardButton_Click(object sender, RoutedEventArgs e)

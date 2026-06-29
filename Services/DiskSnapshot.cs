@@ -102,6 +102,10 @@ public class DiskSnapshot : INotifyPropertyChanged
 
     public string DiskMetaText => string.Join(" / ", new[] { DriveLetters, BusType, MediaType }
         .Where(v => !string.IsNullOrWhiteSpace(v)));
+    public string StorageGroupKey => DiskTemperaturePolicy.GetStorageGroupKey(this);
+    public string StorageGroupTitle => DiskTemperaturePolicy.GetStorageGroupTitle(this);
+    public string TemperatureRuleText => DiskTemperaturePolicy.GetTemperatureRuleText(this);
+    public DiskHealthStatus TemperatureHealth => DiskTemperaturePolicy.MapTemperature(this);
 
     public string LifeRemainingDisplay => FormatPercent(LifeRemainingPercent);
     public string LifeUsedDisplay => FormatPercent(LifeUsedPercent);
@@ -133,6 +137,8 @@ public class DiskSnapshot : INotifyPropertyChanged
 
     internal void UpdateFrom(DiskSnapshot source)
     {
+        string oldStorageGroupKey = StorageGroupKey;
+
         LayoutCardId = source.LayoutCardId;
         Name = source.Name;
         Temperature = source.Temperature;
@@ -169,6 +175,13 @@ public class DiskSnapshot : INotifyPropertyChanged
         BadSectorRiskReason = source.BadSectorRiskReason;
         BadSectorUnavailableReason = source.BadSectorUnavailableReason;
         BadSectorLastCheckedAt = source.BadSectorLastCheckedAt;
+
+        if (!string.Equals(oldStorageGroupKey, StorageGroupKey, StringComparison.OrdinalIgnoreCase))
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StorageGroupKey)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StorageGroupTitle)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TemperatureRuleText)));
+        }
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
     }

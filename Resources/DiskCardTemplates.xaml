@@ -137,18 +137,19 @@
                         </TextBlock>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="2" HorizontalAlignment="Stretch">
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Stretch"
+                                ToolTip="{Binding TemperatureRuleText}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,1">
                             <Path Data="{piw:IconGeometry Icon=thermometer, IconType=regular}"
                                   Style="{StaticResource DiskIconPathStyle}"
-                                  Fill="{Binding Temperature, Converter={StaticResource TempColor}}"
+                                  Fill="{Binding TemperatureHealth, Converter={StaticResource DiskHealthBrush}}"
                                   Width="12" Height="12" Margin="0,0,3,0"/>
                             <TextBlock Text="温度" FontSize="12"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock FontSize="13" HorizontalAlignment="Center"
-                                   Foreground="{Binding Temperature, Converter={StaticResource TempColor}}">
+                                   Foreground="{Binding TemperatureHealth, Converter={StaticResource DiskHealthBrush}}">
                             <Run Text="{Binding Temperature, Converter={StaticResource FloatFmt}, ConverterParameter=F1, Mode=OneWay}"/>
                             <Run Text="°C"/>
                         </TextBlock>

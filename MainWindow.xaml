@@ -570,7 +570,62 @@
                             <TextBlock Text="存储设备" Foreground="{DynamicResource TextSecondaryBrush}"
                                        FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <WrapPanel x:Name="StorageCardPanel" Orientation="Horizontal"/>
+
+                        <StackPanel x:Name="NvmeStorageGroup" Margin="0,0,0,8" Visibility="Collapsed">
+                            <StackPanel Orientation="Horizontal" Margin="4,0,0,6">
+                                <Path Data="{piw:IconGeometry Icon=hard_drive, IconType=regular}"
+                                      Style="{StaticResource IconPathStyle}"
+                                      Fill="{DynamicResource AccentBlueBrush}" Margin="0,0,6,0"/>
+                                <TextBlock Text="NVMe" Foreground="{DynamicResource TextPrimaryBrush}"
+                                           FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Text="预警 60°C / 严重 70°C"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </StackPanel>
+                            <WrapPanel x:Name="NvmeStorageCardPanel" Orientation="Horizontal"/>
+                        </StackPanel>
+
+                        <StackPanel x:Name="SataSsdStorageGroup" Margin="0,0,0,8" Visibility="Collapsed">
+                            <StackPanel Orientation="Horizontal" Margin="4,0,0,6">
+                                <Path Data="{piw:IconGeometry Icon=hard_drive, IconType=regular}"
+                                      Style="{StaticResource IconPathStyle}"
+                                      Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,6,0"/>
+                                <TextBlock Text="SATA SSD" Foreground="{DynamicResource TextPrimaryBrush}"
+                                           FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Text="预警 50°C / 严重 60°C"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </StackPanel>
+                            <WrapPanel x:Name="SataSsdStorageCardPanel" Orientation="Horizontal"/>
+                        </StackPanel>
+
+                        <StackPanel x:Name="HddStorageGroup" Margin="0,0,0,8" Visibility="Collapsed">
+                            <StackPanel Orientation="Horizontal" Margin="4,0,0,6">
+                                <Path Data="{piw:IconGeometry Icon=hard_drive, IconType=regular}"
+                                      Style="{StaticResource IconPathStyle}"
+                                      Fill="{DynamicResource AccentOrangeBrush}" Margin="0,0,6,0"/>
+                                <TextBlock Text="HDD" Foreground="{DynamicResource TextPrimaryBrush}"
+                                           FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Text="预警 42°C / 严重 52°C"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </StackPanel>
+                            <WrapPanel x:Name="HddStorageCardPanel" Orientation="Horizontal"/>
+                        </StackPanel>
+
+                        <StackPanel x:Name="OtherStorageGroup" Margin="0,0,0,8" Visibility="Collapsed">
+                            <StackPanel Orientation="Horizontal" Margin="4,0,0,6">
+                                <Path Data="{piw:IconGeometry Icon=hard_drive, IconType=regular}"
+                                      Style="{StaticResource IconPathStyle}"
+                                      Fill="{DynamicResource TextSecondaryBrush}" Margin="0,0,6,0"/>
+                                <TextBlock Text="其它设备" Foreground="{DynamicResource TextPrimaryBrush}"
+                                           FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Text="按 SATA SSD 规则：预警 50°C / 严重 60°C"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </StackPanel>
+                            <WrapPanel x:Name="OtherStorageCardPanel" Orientation="Horizontal"/>
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>

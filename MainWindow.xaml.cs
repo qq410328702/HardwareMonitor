@@ -15,6 +15,8 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = vm;
         vm.DiskSnapshots.CollectionChanged += DiskSnapshots_CollectionChanged;
+        foreach (var disk in vm.DiskSnapshots)
+            disk.PropertyChanged += DiskSnapshot_PropertyChanged;
         Closing += MainWindow_Closing;
         Loaded += MainWindow_Loaded;
     }
