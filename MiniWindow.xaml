@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:conv="clr-namespace:HardwareMonitor.Converters"
         xmlns:piw="clr-namespace:PhosphorIconsWpf.Markup;assembly=PhosphorIconsWpf"
-        Title="Monitor" Icon="Resources/AppIcon.ico" Width="320" Height="210"
+        Title="Monitor" Icon="Resources/AppIcon.ico" Width="360" Height="220"
         WindowStyle="None" AllowsTransparency="True"
         Topmost="True" ShowInTaskbar="False"
         ResizeMode="NoResize" Background="Transparent">
@@ -25,9 +25,41 @@
             <Setter Property="Width" Value="11"/>
             <Setter Property="Height" Value="11"/>
         </Style>
+
+        <Style x:Key="MiniChromeButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="26"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="#10FFFFFF"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource MiniBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="ButtonChrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="13"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonChrome" Property="Background" Value="{DynamicResource MiniCardBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonChrome" Property="Opacity" Value="0.72"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
-    <Border CornerRadius="16" BorderThickness="2"
+    <Border CornerRadius="18" BorderThickness="1"
             Background="{DynamicResource MiniBgBrush}">
         <Border.Style>
             <Style TargetType="Border">
@@ -40,7 +72,7 @@
             </Style>
         </Border.Style>
         <Border.Effect>
-            <DropShadowEffect BlurRadius="24" ShadowDepth="2" Opacity="0.4" Color="Black"/>
+            <DropShadowEffect BlurRadius="18" ShadowDepth="2" Opacity="0.22" Color="Black"/>
         </Border.Effect>
 
         <Grid>
@@ -49,57 +81,57 @@
                     MouseRightButtonDown="DragArea_MouseRightDown"
                     Panel.ZIndex="0"/>
 
-            <Grid Margin="16,12" Panel.ZIndex="1" IsHitTestVisible="False">
+            <Grid Margin="14,10" Panel.ZIndex="1" IsHitTestVisible="False">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="8"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="7"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="6"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Header -->
-                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <Path Data="{piw:IconGeometry Icon=gauge, IconType=regular}"
                           Style="{StaticResource MiniIconPathStyle}"
                           Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,8,0"/>
-                    <TextBlock Text="Hardware Monitor" FontSize="12" FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextPrimaryBrush}" Opacity="0.7"/>
+                    <TextBlock Text="Hardware Monitor" FontSize="13" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" Opacity="0.78"/>
                 </StackPanel>
 
                 <!-- CPU / GPU -->
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="6"/>
+                        <ColumnDefinition Width="8"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- CPU -->
-                    <Border Grid.Column="0" CornerRadius="10" Padding="12,8"
+                    <Border Grid.Column="0" CornerRadius="12" Padding="12,8"
                             Background="{DynamicResource MiniCardBrush}">
                         <StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                 <Path Data="{piw:IconGeometry Icon=cpu, IconType=regular}"
                                       Style="{StaticResource MiniIconPathStyle}"
                                       Fill="{DynamicResource AccentBlueBrush}" Margin="0,0,4,0"/>
-                                <TextBlock Text="CPU" FontSize="10" Foreground="{DynamicResource AccentBlueBrush}"
+                                <TextBlock Text="CPU" FontSize="11" Foreground="{DynamicResource AccentBlueBrush}"
                                            FontWeight="Bold" VerticalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock FontSize="22" FontWeight="Bold"
+                                <TextBlock FontSize="24" FontWeight="Bold"
                                            Foreground="{DynamicResource TextPrimaryBrush}"
                                            Text="{Binding CpuTemp, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"/>
                                 <TextBlock Text="°" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           VerticalAlignment="Top" Margin="1,2,0,0"/>
-                                <TextBlock FontSize="22" FontWeight="Bold"
+                                           VerticalAlignment="Top" Margin="1,3,0,0"/>
+                                <TextBlock FontSize="20" FontWeight="Bold"
                                            Foreground="{DynamicResource AccentBlueBrush}"
                                            Text="{Binding CpuUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"
-                                           Margin="8,0,0,0"/>
+                                           Margin="10,0,0,0"/>
                                 <TextBlock Text="%" FontSize="11" Foreground="{DynamicResource AccentBlueBrush}"
-                                           VerticalAlignment="Bottom" Margin="1,0,0,4"/>
+                                           VerticalAlignment="Bottom" Margin="1,0,0,3"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
                                 <Path Data="{piw:IconGeometry Icon=lightning, IconType=regular}"
@@ -111,7 +143,7 @@
                                 <TextBlock Text="W" FontSize="9" Foreground="{DynamicResource AccentOrangeBrush}"
                                            VerticalAlignment="Bottom" Margin="2,0,0,2"/>
                             </StackPanel>
-                            <Grid Height="3" Margin="0,4,0,0" x:Name="CpuBarContainer">
+                            <Grid Height="4" Margin="0,5,0,0" x:Name="CpuBarContainer">
                                 <Border Background="{DynamicResource MiniBarBgBrush}" CornerRadius="2"/>
                                 <Border Background="{DynamicResource AccentBlueBrush}" CornerRadius="2"
                                         HorizontalAlignment="Left">
@@ -127,28 +159,28 @@
                     </Border>
 
                     <!-- GPU -->
-                    <Border Grid.Column="2" CornerRadius="10" Padding="12,8"
+                    <Border Grid.Column="2" CornerRadius="12" Padding="12,8"
                             Background="{DynamicResource MiniCardBrush}">
                         <StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                 <Path Data="{piw:IconGeometry Icon=graphics_card, IconType=regular}"
                                       Style="{StaticResource MiniIconPathStyle}"
                                       Fill="{DynamicResource AccentGreenBrush}" Margin="0,0,4,0"/>
-                                <TextBlock Text="GPU" FontSize="10" Foreground="{DynamicResource AccentGreenBrush}"
+                                <TextBlock Text="GPU" FontSize="11" Foreground="{DynamicResource AccentGreenBrush}"
                                            FontWeight="Bold" VerticalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock FontSize="22" FontWeight="Bold"
+                                <TextBlock FontSize="24" FontWeight="Bold"
                                            Foreground="{DynamicResource TextPrimaryBrush}"
                                            Text="{Binding GpuTemp, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"/>
                                 <TextBlock Text="°" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"
-                                           VerticalAlignment="Top" Margin="1,2,0,0"/>
-                                <TextBlock FontSize="22" FontWeight="Bold"
+                                           VerticalAlignment="Top" Margin="1,3,0,0"/>
+                                <TextBlock FontSize="20" FontWeight="Bold"
                                            Foreground="{DynamicResource AccentGreenBrush}"
                                            Text="{Binding GpuUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"
-                                           Margin="8,0,0,0"/>
+                                           Margin="10,0,0,0"/>
                                 <TextBlock Text="%" FontSize="11" Foreground="{DynamicResource AccentGreenBrush}"
-                                           VerticalAlignment="Bottom" Margin="1,0,0,4"/>
+                                           VerticalAlignment="Bottom" Margin="1,0,0,3"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
                                 <Path Data="{piw:IconGeometry Icon=lightning, IconType=regular}"
@@ -160,7 +192,7 @@
                                 <TextBlock Text="W" FontSize="9" Foreground="{DynamicResource AccentOrangeBrush}"
                                            VerticalAlignment="Bottom" Margin="2,0,0,2"/>
                             </StackPanel>
-                            <Grid Height="3" Margin="0,4,0,0" x:Name="GpuBarContainer">
+                            <Grid Height="4" Margin="0,5,0,0" x:Name="GpuBarContainer">
                                 <Border Background="{DynamicResource MiniBarBgBrush}" CornerRadius="2"/>
                                 <Border Background="{DynamicResource AccentGreenBrush}" CornerRadius="2"
                                         HorizontalAlignment="Left">
@@ -180,11 +212,11 @@
                 <Grid Grid.Row="4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="6"/>
+                        <ColumnDefinition Width="8"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0" CornerRadius="10" Padding="12,7"
+                    <Border Grid.Column="0" CornerRadius="12" Padding="12,7"
                             Background="{DynamicResource MiniCardBrush}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -196,10 +228,10 @@
                                 <Path Data="{piw:IconGeometry Icon=memory, IconType=regular}"
                                       Style="{StaticResource MiniIconPathStyle}"
                                       Fill="{DynamicResource AccentPurpleBrush}" Margin="0,0,4,0"/>
-                                <TextBlock Text="RAM" FontSize="10" Foreground="{DynamicResource AccentPurpleBrush}"
+                                <TextBlock Text="RAM" FontSize="11" Foreground="{DynamicResource AccentPurpleBrush}"
                                            FontWeight="Bold" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <Grid Grid.Column="1" VerticalAlignment="Center" Height="3" x:Name="MemBarContainer">
+                            <Grid Grid.Column="1" VerticalAlignment="Center" Height="4" x:Name="MemBarContainer">
                                 <Border Background="{DynamicResource MiniBarBgBrush}" CornerRadius="2"/>
                                 <Border Background="{DynamicResource AccentPurpleBrush}" CornerRadius="2"
                                         HorizontalAlignment="Left">
@@ -212,7 +244,7 @@
                                 </Border>
                             </Grid>
                             <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0">
-                                <TextBlock FontSize="14" FontWeight="Bold"
+                                <TextBlock FontSize="15" FontWeight="Bold"
                                            Foreground="{DynamicResource AccentPurpleBrush}"
                                            Text="{Binding MemUsage, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"
                                            VerticalAlignment="Center"/>
@@ -222,21 +254,21 @@
                         </Grid>
                     </Border>
 
-                    <Border Grid.Column="2" CornerRadius="10" Padding="12,7"
-                            Background="{DynamicResource MiniCardBrush}" MinWidth="70">
+                    <Border Grid.Column="2" CornerRadius="12" Padding="12,7"
+                            Background="{DynamicResource MiniCardBrush}" MinWidth="82">
                         <StackPanel HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <Path Data="{piw:IconGeometry Icon=plug_charging, IconType=regular}"
                                       Style="{StaticResource MiniIconPathStyle}"
-                                      Fill="{DynamicResource AccentOrangeBrush}" Width="10" Height="10" Margin="0,0,3,0"/>
-                                <TextBlock Text="总功耗" FontSize="9" Foreground="{DynamicResource AccentOrangeBrush}"
+                                      Fill="{DynamicResource AccentOrangeBrush}" Width="10" Height="10" Margin="0,0,4,0"/>
+                                <TextBlock Text="总功耗" FontSize="10" Foreground="{DynamicResource AccentOrangeBrush}"
                                            FontWeight="Bold" VerticalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,1,0,0">
                                 <Path Data="{piw:IconGeometry Icon=lightning, IconType=regular}"
                                       Style="{StaticResource MiniIconPathStyle}"
                                       Fill="{DynamicResource AccentOrangeBrush}" Width="11" Height="11" Margin="0,2,2,0"/>
-                                <TextBlock FontSize="15" FontWeight="Bold"
+                                <TextBlock FontSize="16" FontWeight="Bold"
                                            Foreground="{DynamicResource AccentOrangeBrush}"
                                            Text="{Binding TotalPower, Converter={StaticResource FloatFmt}, ConverterParameter=F0}"/>
                                 <TextBlock Text="W" FontSize="10" Foreground="{DynamicResource AccentOrangeBrush}"
@@ -251,18 +283,18 @@
             </Grid>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
-                        Margin="0,10,14,0" Panel.ZIndex="2">
+                        Margin="0,10,12,0" Panel.ZIndex="2">
                 <Button Click="Expand_Click" Style="{x:Null}"
-                        Width="24" Height="22" Cursor="Hand" ToolTip="展开主窗口"
-                        Background="Transparent" Foreground="{DynamicResource TextSecondaryBrush}"
+                        Width="26" Height="26" Cursor="Hand" ToolTip="展开主窗口"
+                        Background="#10FFFFFF" Foreground="{DynamicResource TextSecondaryBrush}"
                         BorderThickness="0" IsHitTestVisible="True">
                     <Path Data="{piw:IconGeometry Icon=arrows_out, IconType=bold}"
                           Style="{StaticResource MiniButtonIconPathStyle}"/>
                 </Button>
                 <Button Click="Close_Click" Style="{x:Null}"
-                        Width="24" Height="22" Cursor="Hand" ToolTip="关闭"
-                        Background="Transparent" Foreground="{DynamicResource TextSecondaryBrush}"
-                        BorderThickness="0" IsHitTestVisible="True">
+                        Width="26" Height="26" Cursor="Hand" ToolTip="关闭"
+                        Background="#10FFFFFF" Foreground="{DynamicResource TextSecondaryBrush}"
+                        BorderThickness="0" IsHitTestVisible="True" Margin="4,0,0,0">
                     <Path Data="{piw:IconGeometry Icon=x, IconType=bold}"
                           Style="{StaticResource MiniButtonIconPathStyle}"/>
                 </Button>
