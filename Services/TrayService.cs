@@ -1,5 +1,7 @@
 using System;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -38,6 +40,7 @@ public class TrayService : ITrayService
 {
     private const string RegistryRunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string AppName = "HardwareMonitor";
+    private const string ExeName = "HardwareMonitor.exe";
 
     private NotifyIcon? _notifyIcon;
     private ToolStripMenuItem? _autoStartItem;
@@ -131,7 +134,14 @@ public class TrayService : ITrayService
             try
             {
                 using var key = Registry.CurrentUser.OpenSubKey(RegistryRunKey, false);
-                return key?.GetValue(AppName) != null;
+                var command = key?.GetValue(AppName)?.ToString() ?? "";
+                if (string.IsNullOrWhiteSpace(command))
+                    return false;
+
+                var exePath = TryExtractExecutablePath(command);
+                return !string.IsNullOrWhiteSpace(exePath) &&
+                    File.Exists(exePath) &&
+                    !IsUnstablePath(exePath);
             }
             catch (Exception ex)
             {
@@ -151,7 +161,7 @@ public class TrayService : ITrayService
 
             if (enable)
             {
-                var exePath = Environment.ProcessPath ?? "";
+                var exePath = ResolveAutoStartExecutablePath();
                 key.SetValue(AppName, $"\"{exePath}\"");
             }
             else
@@ -171,6 +181,155 @@ public class TrayService : ITrayService
             _logger?.Error("修改开机自启设置失败", ex);
             return OperationResult.Failure($"修改开机自启设置失败: {ex.Message}");
         }
+    }
+
+    private static string ResolveAutoStartExecutablePath()
+    {
+        var processPath = Environment.ProcessPath;
+        if (string.IsNullOrWhiteSpace(processPath) || !File.Exists(processPath))
+            throw new InvalidOperationException("无法确定当前程序路径");
+
+        if (!IsUnstablePath(processPath))
+            return processPath;
+
+        return InstallCurrentAppToStableDirectory(processPath);
+    }
+
+    private static string InstallCurrentAppToStableDirectory(string processPath)
+    {
+        var sourceDirectory = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        if (!Directory.Exists(sourceDirectory))
+            throw new DirectoryNotFoundException($"当前程序目录不存在: {sourceDirectory}");
+
+        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var hardwareMonitorRoot = Path.Combine(localAppData, "HardwareMonitor");
+        var targetDirectory = Path.Combine(hardwareMonitorRoot, "App");
+        var stagingDirectory = Path.Combine(hardwareMonitorRoot, "App.staging");
+        var backupDirectory = Path.Combine(hardwareMonitorRoot, "App.previous");
+
+        Directory.CreateDirectory(hardwareMonitorRoot);
+        RecreateDirectory(stagingDirectory);
+        CopyDirectory(sourceDirectory, stagingDirectory, overwrite: true);
+
+        var stagedExe = Path.Combine(stagingDirectory, ExeName);
+        if (!File.Exists(stagedExe))
+        {
+            var fallbackExe = Path.Combine(stagingDirectory, Path.GetFileName(processPath));
+            if (File.Exists(fallbackExe))
+                stagedExe = fallbackExe;
+            else
+                throw new FileNotFoundException("稳定自启目录中未找到 HardwareMonitor.exe", stagedExe);
+        }
+
+        ReplaceDirectory(stagingDirectory, targetDirectory, backupDirectory);
+        return Path.Combine(targetDirectory, Path.GetFileName(stagedExe));
+    }
+
+    private static bool IsUnstablePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return true;
+
+        var fullPath = Path.GetFullPath(path);
+        var tempPath = Path.GetFullPath(Path.GetTempPath());
+        if (IsSubPathOf(fullPath, tempPath))
+            return true;
+
+        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var stableAppPath = Path.Combine(localAppData, "HardwareMonitor", "App");
+        if (IsSubPathOf(fullPath, stableAppPath))
+            return false;
+
+        var directory = Path.GetDirectoryName(fullPath) ?? "";
+        var segments = directory
+            .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            .Where(v => !string.IsNullOrWhiteSpace(v))
+            .ToArray();
+
+        return segments.Any(v =>
+            string.Equals(v, "bin", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(v, "obj", StringComparison.OrdinalIgnoreCase) ||
+            v.StartsWith("HardwareMonitor-run-", StringComparison.OrdinalIgnoreCase) ||
+            v.StartsWith("HardwareMonitor-build-", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string TryExtractExecutablePath(string command)
+    {
+        command = command.Trim();
+        if (command.Length == 0)
+            return "";
+
+        if (command[0] == '"')
+        {
+            var endQuote = command.IndexOf('"', 1);
+            return endQuote > 1 ? command[1..endQuote] : "";
+        }
+
+        var exeIndex = command.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+        if (exeIndex >= 0)
+            return command[..(exeIndex + 4)].Trim();
+
+        var firstSpace = command.IndexOf(' ');
+        return firstSpace > 0 ? command[..firstSpace].Trim() : command;
+    }
+
+    private static void RecreateDirectory(string path)
+    {
+        if (Directory.Exists(path))
+            Directory.Delete(path, true);
+
+        Directory.CreateDirectory(path);
+    }
+
+    private static void ReplaceDirectory(string sourceDirectory, string targetDirectory, string backupDirectory)
+    {
+        if (Directory.Exists(backupDirectory))
+            Directory.Delete(backupDirectory, true);
+
+        if (Directory.Exists(targetDirectory))
+            Directory.Move(targetDirectory, backupDirectory);
+
+        try
+        {
+            Directory.Move(sourceDirectory, targetDirectory);
+            if (Directory.Exists(backupDirectory))
+                Directory.Delete(backupDirectory, true);
+        }
+        catch
+        {
+            if (!Directory.Exists(targetDirectory) && Directory.Exists(backupDirectory))
+                Directory.Move(backupDirectory, targetDirectory);
+            throw;
+        }
+    }
+
+    private static void CopyDirectory(string sourceDirectory, string targetDirectory, bool overwrite)
+    {
+        Directory.CreateDirectory(targetDirectory);
+
+        foreach (var directory in Directory.EnumerateDirectories(sourceDirectory, "*", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(sourceDirectory, directory);
+            Directory.CreateDirectory(Path.Combine(targetDirectory, relative));
+        }
+
+        foreach (var file in Directory.EnumerateFiles(sourceDirectory, "*", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(sourceDirectory, file);
+            var destination = Path.Combine(targetDirectory, relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+            File.Copy(file, destination, overwrite);
+        }
+    }
+
+    private static bool IsSubPathOf(string path, string basePath)
+    {
+        var normalizedPath = Path.GetFullPath(path)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        var normalizedBase = Path.GetFullPath(basePath)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+
+        return normalizedPath.StartsWith(normalizedBase, StringComparison.OrdinalIgnoreCase);
     }
 
     private ContextMenuStrip CreateContextMenu()

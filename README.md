@@ -127,6 +127,7 @@ dotnet publish .\HardwareMonitor.csproj -c Release -r win-x64 -o .\publish
 - 主窗口：标题栏拖拽移动，点击 `🔽` 切换悬浮窗
 - 主题：通过标题栏下拉框切换
 - 托盘菜单：显示主窗口、显示迷你窗口、检查更新、开机自启、退出
+- 开机自启会使用稳定本地目录 `%LOCALAPPDATA%\HardwareMonitor\App\`；如果当前从临时构建目录运行，首次启用时会自动复制到该目录
 - 更新：启动后会自动检查一次，也可通过主窗口标题栏或托盘菜单手动检查
 - 电费统计只累计应用运行期间检测到的功耗，配置和累计数据保存在 `%LOCALAPPDATA%\HardwareMonitor\electricity.json`
 - 管理员运行可读取更多硬件传感器和 SMART 可靠性字段
